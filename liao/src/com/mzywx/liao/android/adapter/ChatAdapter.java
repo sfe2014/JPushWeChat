@@ -106,26 +106,28 @@ public class ChatAdapter extends BaseAdapter {
         }
 
         holder.itemTime.setText(TimeModule.getTimeFormat());
+
         int contentType = mDatas.get(position).getContentType();
         switch (contentType) {
         case MessageContentType.TXT:
+            holder.itemContentImg.setVisibility(View.GONE);
+            holder.itemContentTxt.setVisibility(View.VISIBLE);
             holder.itemContentTxt.setText(mDatas.get(position).getContent());
             break;
         case MessageContentType.IMG:
-            if (type == MessageType.FROM) {
-                holder.itemContentTxt.setText(mDatas.get(position).getContent());
-                holder.itemContentImg.setVisibility(View.VISIBLE);
-                String icon = mDatas.get(position).getContentImageUrl();
-                if (!TextUtils.isEmpty(icon)) {
-                    Picasso.with(mContext).load(icon).into(holder.itemContentImg);
-                }
-            } else {
-                holder.itemContentImg.setVisibility(View.VISIBLE);
-                Bitmap bitmap = (Bitmap) mDatas.get(position).getContentImage()
-                        .getParcelable("bitmap");
-                holder.itemContentImg.setImageBitmap(bitmap);
+            holder.itemContentTxt.setVisibility(View.GONE);
+            holder.itemContentImg.setVisibility(View.VISIBLE);
+            Bitmap bitmap = (Bitmap) mDatas.get(position).getContentImage()
+                    .getParcelable("bitmap");
+            holder.itemContentImg.setImageBitmap(bitmap);
+            break;
+        case MessageContentType.IMG_TXT:
+            holder.itemContentTxt.setText(mDatas.get(position).getContent());
+            holder.itemContentImg.setVisibility(View.VISIBLE);
+            String icon = mDatas.get(position).getContentImageUrl();
+            if (!TextUtils.isEmpty(icon)) {
+                Picasso.with(mContext).load(icon).into(holder.itemContentImg);
             }
-            
             break;
         case MessageContentType.VOICE:
 

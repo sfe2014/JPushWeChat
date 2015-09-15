@@ -21,6 +21,7 @@ public class ChatMessage implements Serializable {
         public static final int DEFAULT = -1;
         public static final int TXT = 0;// 文本
         public static final int IMG = 1;// 图片
+        public static final int IMG_TXT = 3;// 图片+文本
         public static final int VOICE = 2;// 语音
     }
 

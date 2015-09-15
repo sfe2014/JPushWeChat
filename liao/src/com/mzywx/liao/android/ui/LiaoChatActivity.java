@@ -242,7 +242,6 @@ public class LiaoChatActivity extends Activity implements
     /**
      * 添加文本
      */
-
     private void addTxt(int messageType, String content) {
         mDatas.add(new ChatMessage(messageType, content, MessageContentType.TXT));
         mChatAdapter.notifyDataSetChanged();
@@ -264,7 +263,7 @@ public class LiaoChatActivity extends Activity implements
      */
     private void addImgAndTxtJPush(String txt, String img) {
         mDatas.add(new ChatMessage(MessageType.FROM, txt, img,
-                MessageContentType.IMG));
+                MessageContentType.IMG_TXT));
         mChatAdapter.notifyDataSetChanged();
         setListViewPos(mChatAdapter.getCount());
     }
