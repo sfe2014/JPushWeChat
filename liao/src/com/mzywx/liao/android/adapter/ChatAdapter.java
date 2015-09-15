@@ -14,12 +14,18 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ChatAdapter extends BaseAdapter {
+    
+    public interface VoiceClickListener{
+        void onVoiceClick(int position);
+    }
+    
     private static final int CHAT_TYPE = 2;
 
     private static final int MSG_FROM = 0;
@@ -28,11 +34,13 @@ public class ChatAdapter extends BaseAdapter {
     private Context mContext;
     private List<ChatMessage> mDatas;
     private LayoutInflater mInflater;
+    private VoiceClickListener mListener;
 
-    public ChatAdapter(Context context, List<ChatMessage> data) {
+    public ChatAdapter(Context context, List<ChatMessage> data,VoiceClickListener listener) {
         mContext = context;
         mDatas = data;
         mInflater = LayoutInflater.from(context);
+        mListener = listener;
     }
 
     @Override
@@ -66,7 +74,7 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup arg2) {
+    public View getView(final int position, View convertView, ViewGroup arg2) {
         final ChatMessage msg = mDatas.get(position);
         int type = msg.getType();
         ViewHolder holder = null;
@@ -75,6 +83,8 @@ public class ChatAdapter extends BaseAdapter {
             switch (type) {
             case MessageType.FROM:
                 convertView = mInflater.inflate(R.layout.chat_from, null);
+                holder.itemVoice = (ImageView) convertView
+                        .findViewById(R.id.id_chat_item_from_content_voice);
                 holder.itemTime = (TextView) convertView
                         .findViewById(R.id.id_chat_item_from_time);
                 holder.itemIcon = (ImageView) convertView
@@ -87,6 +97,8 @@ public class ChatAdapter extends BaseAdapter {
                 break;
             case MessageType.TO:
                 convertView = mInflater.inflate(R.layout.chat_to, null);
+                holder.itemVoice = (ImageView) convertView
+                        .findViewById(R.id.id_chat_item_to_content_voice);
                 holder.itemTime = (TextView) convertView
                         .findViewById(R.id.id_chat_item_to_time);
                 holder.itemIcon = (ImageView) convertView
@@ -112,16 +124,21 @@ public class ChatAdapter extends BaseAdapter {
         case MessageContentType.TXT:
             holder.itemContentImg.setVisibility(View.GONE);
             holder.itemContentTxt.setVisibility(View.VISIBLE);
+            
             holder.itemContentTxt.setText(mDatas.get(position).getContent());
             break;
         case MessageContentType.IMG:
             holder.itemContentTxt.setVisibility(View.GONE);
             holder.itemContentImg.setVisibility(View.VISIBLE);
+            
             Bitmap bitmap = (Bitmap) mDatas.get(position).getContentImage()
                     .getParcelable("bitmap");
             holder.itemContentImg.setImageBitmap(bitmap);
             break;
         case MessageContentType.IMG_TXT:
+            holder.itemContentTxt.setVisibility(View.VISIBLE);
+            holder.itemContentImg.setVisibility(View.VISIBLE);
+            
             holder.itemContentTxt.setText(mDatas.get(position).getContent());
             holder.itemContentImg.setVisibility(View.VISIBLE);
             String icon = mDatas.get(position).getContentImageUrl();
@@ -130,9 +147,16 @@ public class ChatAdapter extends BaseAdapter {
             }
             break;
         case MessageContentType.VOICE:
-
+            holder.itemVoice.setVisibility(View.VISIBLE);
+            holder.itemContentTxt.setVisibility(View.GONE);
+            holder.itemContentImg.setVisibility(View.GONE);
+            holder.itemVoice.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    mListener.onVoiceClick(position);
+                }
+            });
             break;
-
         default:
             break;
         }
@@ -141,6 +165,7 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
+        ImageView itemVoice;
         TextView itemTime;
         ImageView itemIcon;
         TextView itemContentTxt;

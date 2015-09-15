@@ -7,6 +7,7 @@ import cn.jpush.android.api.JPushInterface;
 
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.adapter.ChatAdapter;
+import com.mzywx.liao.android.adapter.ChatAdapter.VoiceClickListener;
 import com.mzywx.liao.android.model.ChatMessage;
 import com.mzywx.liao.android.model.ChatMessage.MessageContentType;
 import com.mzywx.liao.android.model.ChatMessage.MessageType;
@@ -42,9 +43,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class LiaoChatActivity extends Activity implements
-        OnLayoutChangeListener {
+        OnLayoutChangeListener, VoiceClickListener {
 
     private static final int PICK_IMAGE = 0x10;
     private static final int PICK_CAMERA = 0x11;
@@ -82,8 +84,8 @@ public class LiaoChatActivity extends Activity implements
     public static final String KEY_TITLE = "title";
     public static final String KEY_MESSAGE = "message";
     public static final String KEY_EXTRAS = "extras";
-    public static final String KEY_IMG = "img";//自定义消息中的图片
-    public static final String KEY_VOICE = "voice";//自定义消息中的语音
+    public static final String KEY_IMG = "img";// 自定义消息中的图片
+    public static final String KEY_VOICE = "voice";// 自定义消息中的语音
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,18 +155,16 @@ public class LiaoChatActivity extends Activity implements
     }
 
     private void initDatas() {
-        mChatAdapter = new ChatAdapter(this, mDatas);
+        mChatAdapter = new ChatAdapter(this, mDatas, this);
         mChatListView.setAdapter(mChatAdapter);
         mChatListView.setOnScrollListener(mListViewScrollListener);
 
         mDatas.add(new ChatMessage(MessageType.FROM, "牛市",
                 MessageContentType.TXT));
-        mDatas.add(new ChatMessage(MessageType.TO, "熊市",
-                MessageContentType.TXT));
+        mDatas.add(new ChatMessage(MessageType.TO, "熊市", MessageContentType.TXT));
         mDatas.add(new ChatMessage(MessageType.FROM, "牛市",
                 MessageContentType.TXT));
-        mDatas.add(new ChatMessage(MessageType.TO, "熊市",
-                MessageContentType.TXT));
+        mDatas.add(new ChatMessage(MessageType.TO, "熊市", MessageContentType.TXT));
         mDatas.add(new ChatMessage(MessageType.TO, "奥巴马",
                 MessageContentType.TXT));
         mDatas.add(new ChatMessage(MessageType.TO, "维多利亚",
@@ -269,6 +269,15 @@ public class LiaoChatActivity extends Activity implements
     }
 
     /**
+     * 推送 语音
+     */
+    private void addVoice(String voice) {
+        mDatas.add(new ChatMessage(MessageType.FROM, voice, MessageContentType.VOICE, 0));
+        mChatAdapter.notifyDataSetChanged();
+        setListViewPos(mChatAdapter.getCount());
+    }
+
+    /**
      * 滚动ListView到指定位置
      * 
      * @param pos
@@ -368,14 +377,22 @@ public class LiaoChatActivity extends Activity implements
         }
     }
 
+    @Override
+    public void onVoiceClick(int position) {
+        Toast.makeText(this, ""+position, Toast.LENGTH_SHORT).show();
+    }
+
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (MESSAGE_RECEIVED_ACTION.equals(intent.getAction())) {
                 String messge = intent.getStringExtra(KEY_MESSAGE);
                 String img = intent.getStringExtra(KEY_IMG);
+                String voice = intent.getStringExtra(KEY_VOICE);
                 if (!TextUtils.isEmpty(img)) {
                     addImgAndTxtJPush(messge, img);
+                } else if (!TextUtils.isEmpty(voice)) {
+                    addVoice(voice);
                 } else {
                     addTxt(MessageType.FROM, messge);
                 }

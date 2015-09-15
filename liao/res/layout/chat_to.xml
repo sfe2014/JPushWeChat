@@ -28,6 +28,15 @@
             android:background="@drawable/back_chat_to" >
 
             <ImageView
+                android:id="@+id/id_chat_item_to_content_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_chat_voice_default"
+                android:visibility="gone" />
+
+            <ImageView
                 android:id="@+id/id_chat_item_to_content_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

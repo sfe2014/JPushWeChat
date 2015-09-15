@@ -42,11 +42,12 @@ public class JPushReceiver extends BroadcastReceiver {
             processCustomMessage(context, bundle);
         } else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent
                 .getAction())) {
-            Log.d(TAG, "[MyReceiver] 接收到推送下来的通知");//富文本下发的action
+            Log.d(TAG, "[MyReceiver] 接收到推送下来的通知");// 富文本下发的action
             int notifactionId = bundle
                     .getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
-//            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//            nm.cancel(notifactionId);//取消通知
+            // NotificationManager nm = (NotificationManager)
+            // context.getSystemService(Context.NOTIFICATION_SERVICE);
+            // nm.cancel(notifactionId);//取消通知
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent
                 .getAction())) {
             Log.d(TAG, "[MyReceiver] 用户点击打开了通知");
@@ -88,7 +89,7 @@ public class JPushReceiver extends BroadcastReceiver {
         if (LiaoChatActivity.isForeground) {
             String message = bundle.getString(JPushInterface.EXTRA_MESSAGE);
             String extras = bundle.getString(JPushInterface.EXTRA_EXTRA);
-            
+
             Intent msgIntent = new Intent(
                     LiaoChatActivity.MESSAGE_RECEIVED_ACTION);
             msgIntent.putExtra(LiaoChatActivity.KEY_MESSAGE, message);
@@ -96,7 +97,20 @@ public class JPushReceiver extends BroadcastReceiver {
                 try {
                     JSONObject extraJson = new JSONObject(extras);
                     if (null != extraJson && extraJson.length() > 0) {
-                        msgIntent.putExtra(LiaoChatActivity.KEY_IMG, extraJson.getString("img"));
+                        if (!extraJson.isNull(LiaoChatActivity.KEY_IMG)) {
+                            msgIntent
+                                    .putExtra(
+                                            LiaoChatActivity.KEY_IMG,
+                                            extraJson
+                                                    .getString(LiaoChatActivity.KEY_IMG));
+                        }
+                        if (!extraJson.isNull(LiaoChatActivity.KEY_VOICE)) {
+                            msgIntent
+                                    .putExtra(
+                                            LiaoChatActivity.KEY_VOICE,
+                                            extraJson
+                                                    .getString(LiaoChatActivity.KEY_VOICE));
+                        }
                     }
                 } catch (JSONException e) {
 

@@ -35,6 +35,8 @@ public class ChatMessage implements Serializable {
     private String content;
 
     private String contentImageUrl;
+    
+    private String coontentVoiceUrl;
     /**
      * 内容类型
      */
@@ -43,7 +45,7 @@ public class ChatMessage implements Serializable {
     private Bundle contentImage;
 
     /**
-     * 发送文字
+     * 发送文字 
      * 
      * @param messageType
      *            消息类型
@@ -60,7 +62,7 @@ public class ChatMessage implements Serializable {
     }
 
     /**
-     * 
+     * 推送 图片和文字
      * @param type
      *            消息类型
      * @param content
@@ -78,9 +80,23 @@ public class ChatMessage implements Serializable {
         this.contentImageUrl = contentImageUrl;
         this.contentType = contentType;
     }
+    
+    
+    /**
+     * 推送语音
+     * @param type
+     * @param coontentVoiceUrl
+     * @param contentType
+     */
+    public ChatMessage(int type, String coontentVoiceUrl, int contentType, int flag) {
+        super();
+        this.type = type;
+        this.coontentVoiceUrl = coontentVoiceUrl;
+        this.contentType = contentType;
+    }
 
     /**
-     * 发送图片
+     * 发送图片 本地
      * 
      * @param messageType
      * @param bitmap
@@ -131,6 +147,14 @@ public class ChatMessage implements Serializable {
 
     public void setContentImageUrl(String contentImageUrl) {
         this.contentImageUrl = contentImageUrl;
+    }
+
+    public String getCoontentVoiceUrl() {
+        return coontentVoiceUrl;
+    }
+
+    public void setCoontentVoiceUrl(String coontentVoiceUrl) {
+        this.coontentVoiceUrl = coontentVoiceUrl;
     }
 
     @Override
