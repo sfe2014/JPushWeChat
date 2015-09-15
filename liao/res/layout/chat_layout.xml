@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/id_chat_main_rootview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LiaoChatActivity" >
+
+    <com.mzywx.liao.android.utils.CustomTopBarNew
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ListView
+        android:id="@+id/id_chat_main_list"
+        style="@style/widget_listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.25" >
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="bottom" >
+
+        <ImageButton
+            android:id="@+id/id_chat_main_voice"
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_chat_voice" />
+
+        <EditText
+            android:id="@+id/id_chat_main_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text" >
+        </EditText>
+
+        <Button
+            android:id="@+id/id_chat_main_send"
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:background="@drawable/back_send_selector"
+            android:text="发送"
+            android:textColor="@color/color_white"
+            android:visibility="gone" >
+        </Button>
+
+        <ImageButton
+            android:id="@+id/id_chat_main_add"
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_chat_add" />
+    </LinearLayout>
+
+</LinearLayout>

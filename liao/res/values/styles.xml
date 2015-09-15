@@ -1,0 +1,38 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="CustomWindowAnimation" parent="@android:style/Animation.Activity">
+
+        <!-- A to B, show B -->
+        <item name="android:activityOpenEnterAnimation">@anim/activity_enter</item>
+        <!-- A to B, hide A -->
+        <item name="android:activityOpenExitAnimation">@anim/activity_exit</item>
+        <!-- B to A, show A -->
+        <item name="android:activityCloseEnterAnimation">@anim/activity_enter</item>
+        <!-- B to A, show B -->
+        <item name="android:activityCloseExitAnimation">@anim/activity_exit</item>
+    </style>
+
+    <style name="BaseAnimationNoActionBar" mce_bogus="1" parent="@android:style/Theme.Holo.Light.NoActionBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowNoDisplay">false</item>
+        <item name="android:windowAnimationStyle">@style/CustomWindowAnimation</item>
+    </style>
+
+    <style name="AnimationFullScreen" parent="@style/BaseAnimationNoActionBar">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="HalfAlphdBackground" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:background">#01000000</item>
+    </style>
+
+    <style name="widget_listview">
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">@dimen/listview_divider_height</item>
+        <item name="android:listSelector">#00000000</item>
+        <item name="android:fadingEdge">none</item>
+        <item name="android:scrollingCache">false</item>
+    </style>
+
+</resources>

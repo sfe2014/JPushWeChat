@@ -1,0 +1,20 @@
+<resources>
+
+    <!-- topbar -->
+    <dimen name="text_big_big">18.0dp</dimen>
+    <!-- topbar -->
+    <dimen name="text_big">16.0dp</dimen>
+    <!-- topbar -->
+    <dimen name="text_medium">16.0dp</dimen>
+
+    <!-- bars -->
+    <dimen name="topbar_height">50.0dp</dimen>
+
+    <!-- listview -->
+    <dimen name="listview_divider_height">0.5dp</dimen>
+    
+    <!-- chat adapter -->
+    <dimen name="chat_icon_height">36dp</dimen>
+    <dimen name="chat_icon_width">36dp</dimen>
+
+</resources>
