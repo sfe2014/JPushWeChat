@@ -1,5 +1,6 @@
 package com.mzywx.liao.android.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +12,14 @@ import com.mzywx.liao.android.adapter.ChatAdapter.VoiceClickListener;
 import com.mzywx.liao.android.model.ChatMessage;
 import com.mzywx.liao.android.model.ChatMessage.MessageContentType;
 import com.mzywx.liao.android.model.ChatMessage.MessageType;
+import com.mzywx.liao.android.model.MediaManager;
+import com.mzywx.liao.android.model.MediaManager.GetDurationCallBack;
+import com.mzywx.liao.android.model.Recorder;
+import com.mzywx.liao.android.utils.AudioRecorderButton;
+import com.mzywx.liao.android.utils.AudioRecorderButton.AudioFinishRecorderListener;
 import com.mzywx.liao.android.utils.CameraUtils;
 import com.mzywx.liao.android.utils.CustomTopBarNew;
 import com.mzywx.liao.android.utils.ImageUtils;
-import com.mzywx.liao.android.utils.JPushUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,6 +30,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -42,6 +53,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -56,6 +68,8 @@ public class LiaoChatActivity extends Activity implements
     private static final int ICON_WIDTH_AND_HEIGHT = 200;
 
     private View mRootView;
+    private View mBottomView;
+
     // 屏幕高度
     private int screenHeight = 0;
     // 软件盘弹起后所占高度阀值
@@ -67,8 +81,9 @@ public class LiaoChatActivity extends Activity implements
 
     private EditText mContentEdit;
     private Button mSendButton;
-    private ImageButton mAddButton;
-    private ImageButton mVoiceButton;
+    private ImageButton mAddPictureButton;
+    private ImageButton mVoiceToggleButton;
+    private AudioRecorderButton mVoiceButton;
 
     private String mContentString;
 
@@ -105,6 +120,7 @@ public class LiaoChatActivity extends Activity implements
         JPushInterface.onResume(this);
         isForeground = true;
         mRootView.addOnLayoutChangeListener(this);
+        MediaManager.resume();
     }
 
     @Override
@@ -112,12 +128,14 @@ public class LiaoChatActivity extends Activity implements
         super.onPause();
         isForeground = false;
         JPushInterface.onPause(this);
+        MediaManager.pause();
     }
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(mMessageReceiver);
         super.onDestroy();
+        unregisterReceiver(mMessageReceiver);
+        MediaManager.release();
     }
 
     public void registerMessageReceiver() {
@@ -137,15 +155,28 @@ public class LiaoChatActivity extends Activity implements
         // 阀值设置为屏幕高度的1/3
         keyHeight = screenHeight / 3;
 
+        mBottomView = findViewById(R.id.id_chat_main_btn_bottom);
         mChatListView = (ListView) findViewById(R.id.id_chat_main_list);
         mContentEdit = (EditText) findViewById(R.id.id_chat_main_edit);
         mContentEdit.addTextChangedListener(new ContentWatcher());
         mSendButton = (Button) findViewById(R.id.id_chat_main_send);
         mSendButton.setOnClickListener(mOnClickListener);
-        mAddButton = (ImageButton) findViewById(R.id.id_chat_main_add);
-        mAddButton.setOnClickListener(mOnClickListener);
-        mVoiceButton = (ImageButton) findViewById(R.id.id_chat_main_voice);
-        mVoiceButton.setOnClickListener(mOnClickListener);
+        mAddPictureButton = (ImageButton) findViewById(R.id.id_chat_main_add);
+        mAddPictureButton.setOnClickListener(mOnClickListener);
+        mVoiceToggleButton = (ImageButton) findViewById(R.id.id_chat_main_voice);
+        mVoiceToggleButton.setOnClickListener(mOnClickListener);
+        mVoiceButton = (AudioRecorderButton) findViewById(R.id.id_chat_main_record);
+        mVoiceButton
+                .setAudioFinishRecorderListener(new AudioFinishRecorderListener() {
+                    @Override
+                    public void onFinish(float seconds, String filePath) {// 录音完成后的回调
+                        Recorder recorder = new Recorder(seconds, filePath);
+                        mDatas.add(new ChatMessage(MessageType.TO, recorder,
+                                MessageContentType.VOICE));
+                        mChatAdapter.notifyDataSetChanged();
+                        setListViewPos(mChatAdapter.getCount());
+                    }
+                });
     }
 
     private void initTopBar() {
@@ -271,10 +302,19 @@ public class LiaoChatActivity extends Activity implements
     /**
      * 推送 语音
      */
-    private void addVoice(String voice) {
-        mDatas.add(new ChatMessage(MessageType.FROM, voice, MessageContentType.VOICE, 0));
-        mChatAdapter.notifyDataSetChanged();
-        setListViewPos(mChatAdapter.getCount());
+    private void addVoice(final String voice) {
+        MediaManager.getMediaDuration(voice, new GetDurationCallBack() {
+            @Override
+            public void getDurationCallback(int duration) {
+                MediaManager.release();
+                Recorder recorder = new Recorder(duration, voice);
+                
+                mDatas.add(new ChatMessage(MessageType.FROM, recorder,
+                        MessageContentType.VOICE));
+                mChatAdapter.notifyDataSetChanged();
+                setListViewPos(mChatAdapter.getCount());
+            }
+        });
     }
 
     /**
@@ -290,6 +330,14 @@ public class LiaoChatActivity extends Activity implements
         }
     }
 
+    private void hideImm() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        boolean isShown = imm.isActive();
+        if (isShown) {
+            imm.hideSoftInputFromWindow(mContentEdit.getWindowToken(), 0);
+        }
+    }
+
     private OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -301,34 +349,53 @@ public class LiaoChatActivity extends Activity implements
                 mContentEdit.setText("");
                 break;
             case R.id.id_chat_main_add:
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                    CameraUtils.openCameraOrPicture(LiaoChatActivity.this,
-                            PICK_IMAGE);
+                if (mVoiceButton.getVisibility() == View.VISIBLE) {
+                    mVoiceButton.setVisibility(View.GONE);
+                    mBottomView.setVisibility(View.VISIBLE);
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            LiaoChatActivity.this);
-                    builder.setTitle(R.string.modify_icon_dialog_title)
-                            .setItems(R.array.modify_icon_dialog_choices,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface arg0, int which) {
-                                            if (which == 0) {
-                                                CameraUtils.openCamera(
-                                                        LiaoChatActivity.this,
-                                                        PICK_CAMERA);
-                                            } else if (which == 1) {
-                                                CameraUtils.openPhotos(
-                                                        LiaoChatActivity.this,
-                                                        PICK_PICTURE);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                        CameraUtils.openCameraOrPicture(LiaoChatActivity.this,
+                                PICK_IMAGE);
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(
+                                LiaoChatActivity.this);
+                        builder.setTitle(R.string.modify_icon_dialog_title)
+                                .setItems(R.array.modify_icon_dialog_choices,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(
+                                                    DialogInterface arg0,
+                                                    int which) {
+                                                if (which == 0) {
+                                                    CameraUtils
+                                                            .openCamera(
+                                                                    LiaoChatActivity.this,
+                                                                    PICK_CAMERA);
+                                                } else if (which == 1) {
+                                                    CameraUtils
+                                                            .openPhotos(
+                                                                    LiaoChatActivity.this,
+                                                                    PICK_PICTURE);
+                                                }
                                             }
-                                        }
-                                    }).create().show();
+                                        }).create().show();
+                    }
                 }
-
                 break;
             case R.id.id_chat_main_voice:
                 mContentType = MessageContentType.VOICE;
+                if (mBottomView.getVisibility() == View.VISIBLE) {
+                    mVoiceToggleButton
+                            .setImageResource(R.drawable.ic_chat_keyboard);
+                    hideImm();
+                    mVoiceButton.setVisibility(View.VISIBLE);
+                    mBottomView.setVisibility(View.GONE);
+                } else {
+                    mVoiceToggleButton
+                            .setImageResource(R.drawable.ic_chat_voice_button);
+                    mVoiceButton.setVisibility(View.GONE);
+                    mBottomView.setVisibility(View.VISIBLE);
+                }
                 break;
             default:
                 break;
@@ -357,12 +424,7 @@ public class LiaoChatActivity extends Activity implements
         public void onScroll(AbsListView arg0, int firstVisibleItem,
                 int visibleItemCount, int totalItemCount) {
             if (scrollFlag) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                boolean isShown = imm.isActive();
-                if (isShown) {
-                    imm.hideSoftInputFromWindow(mContentEdit.getWindowToken(),
-                            0);
-                }
+                hideImm();
             }
         }
     };
@@ -377,9 +439,43 @@ public class LiaoChatActivity extends Activity implements
         }
     }
 
+    View animView;
+
     @Override
-    public void onVoiceClick(int position) {
-        Toast.makeText(this, ""+position, Toast.LENGTH_SHORT).show();
+    public void onVoiceClick(View view, int position) {
+        final int messageType = mDatas.get(position).getType();
+        if (animView != null) {
+            if (messageType == MessageType.FROM) {
+                animView.setBackgroundResource(R.drawable.ic_chat_voice_from);
+                animView = view.findViewById(R.id.id_chat_item_from_content_voice_anim);
+            } else if (messageType == MessageType.TO) {
+                animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
+                animView = view.findViewById(R.id.id_chat_item_to_content_voice_anim);
+            }
+        }
+        if (messageType == MessageType.FROM) {
+            animView = view.findViewById(R.id.id_chat_item_from_content_voice_anim);
+        } else if (messageType == MessageType.TO) {
+            animView = view.findViewById(R.id.id_chat_item_to_content_voice_anim);
+        }
+        animView.setBackgroundResource(R.drawable.recoder_play);
+        final AnimationDrawable drawable = (AnimationDrawable) animView
+                .getBackground();
+        drawable.setOneShot(false);
+        drawable.start();
+
+        String filePath = mDatas.get(position).getRecorder().getFilePath();
+        MediaManager.playSound(filePath, new OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer arg0) {
+                drawable.stop();
+                if (messageType == MessageType.FROM) {
+                    animView.setBackgroundResource(R.drawable.ic_chat_voice_from);
+                } else if (messageType == MessageType.TO) {
+                    animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
+                }
+            }
+        });
     }
 
     public class MessageReceiver extends BroadcastReceiver {
@@ -418,12 +514,12 @@ public class LiaoChatActivity extends Activity implements
             if (s.length() > 0) {
                 mContentType = MessageContentType.TXT;
                 mSendButton.setVisibility(View.VISIBLE);
-                mAddButton.setVisibility(View.GONE);
+                mAddPictureButton.setVisibility(View.GONE);
                 mContentString = s.toString();
             } else {
                 mContentType = MessageContentType.DEFAULT;
                 mSendButton.setVisibility(View.GONE);
-                mAddButton.setVisibility(View.VISIBLE);
+                mAddPictureButton.setVisibility(View.VISIBLE);
             }
         }
     }

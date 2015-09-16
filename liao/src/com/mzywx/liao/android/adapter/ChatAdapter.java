@@ -12,10 +12,12 @@ import com.squareup.picasso.Picasso;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,38 +25,44 @@ import android.widget.TextView;
 public class ChatAdapter extends BaseAdapter {
     
     public interface VoiceClickListener{
-        void onVoiceClick(int position);
+        void onVoiceClick(View view, int position);
     }
     
-    private static final int CHAT_TYPE = 2;
-
-    private static final int MSG_FROM = 0;
-    private static final int MSG_TO = 1;
+    private static final int CHAT_TYPE_COUNT = 2;
 
     private Context mContext;
     private List<ChatMessage> mDatas;
     private LayoutInflater mInflater;
     private VoiceClickListener mListener;
+    
+    private int mMinItemWidth;
+    private int mMaxItemWidth;
 
     public ChatAdapter(Context context, List<ChatMessage> data,VoiceClickListener listener) {
         mContext = context;
         mDatas = data;
         mInflater = LayoutInflater.from(context);
         mListener = listener;
+        WindowManager wm = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(outMetrics);
+        mMaxItemWidth = (int) (outMetrics.widthPixels * 0.7f);
+        mMinItemWidth= (int) (outMetrics.widthPixels * 0.15f);
     }
 
     @Override
     public int getViewTypeCount() {
-        return CHAT_TYPE;
+        return CHAT_TYPE_COUNT;
     }
 
     @Override
     public int getItemViewType(int position) {
         ChatMessage msg = mDatas.get(position);
         if (msg.getType() == MessageType.FROM) {
-            return MSG_FROM;
+            return MessageType.FROM;
         } else {
-            return MSG_TO;
+            return MessageType.TO;
         }
     }
 
@@ -77,44 +85,62 @@ public class ChatAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup arg2) {
         final ChatMessage msg = mDatas.get(position);
         int type = msg.getType();
-        ViewHolder holder = null;
+        ViewHolder holder = new ViewHolder();
         if (convertView == null) {
             holder = new ViewHolder();
             switch (type) {
             case MessageType.FROM:
                 convertView = mInflater.inflate(R.layout.chat_from, null);
-                holder.itemVoice = (ImageView) convertView
-                        .findViewById(R.id.id_chat_item_from_content_voice);
+                holder.itemVoiceView = convertView
+                        .findViewById(R.id.id_chat_item_from_content_voice_layout);
+                holder.itemVoiceAnim = convertView
+                        .findViewById(R.id.id_chat_item_from_content_voice_anim);
+                holder.itemVoiceSeconds = (TextView) convertView
+                        .findViewById(R.id.id_chat_item_from_content_voice_seconds);
+                
                 holder.itemTime = (TextView) convertView
                         .findViewById(R.id.id_chat_item_from_time);
                 holder.itemIcon = (ImageView) convertView
-                        .findViewById(R.id.id_chat_item_from_icon);
+                        .findViewById(R.id.id_chat_item_from_user_icon);
                 holder.itemContentTxt = (TextView) convertView
                         .findViewById(R.id.id_chat_item_from_content_txt);
                 holder.itemContentImg = (ImageView) convertView
                         .findViewById(R.id.id_chat_item_from_content_img);
-                holder.itemMsgType = MessageType.FROM;
+                convertView.setTag(holder);
                 break;
             case MessageType.TO:
                 convertView = mInflater.inflate(R.layout.chat_to, null);
-                holder.itemVoice = (ImageView) convertView
-                        .findViewById(R.id.id_chat_item_to_content_voice);
+                holder.itemVoiceView = convertView
+                        .findViewById(R.id.id_chat_item_to_content_voice_layout);
+                holder.itemVoiceAnim = convertView
+                        .findViewById(R.id.id_chat_item_to_content_voice_anim);
+                holder.itemVoiceSeconds = (TextView) convertView
+                        .findViewById(R.id.id_chat_item_to_content_voice_seconds);
+                
                 holder.itemTime = (TextView) convertView
                         .findViewById(R.id.id_chat_item_to_time);
                 holder.itemIcon = (ImageView) convertView
-                        .findViewById(R.id.id_chat_item_to_icon);
+                        .findViewById(R.id.id_chat_item_to_user_icon);
                 holder.itemContentTxt = (TextView) convertView
                         .findViewById(R.id.id_chat_item_to_content_txt);
                 holder.itemContentImg = (ImageView) convertView
                         .findViewById(R.id.id_chat_item_to_content_img);
-                holder.itemMsgType = MessageType.TO;
+                convertView.setTag(holder);
                 break;
             default:
                 break;
             }
-            convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            switch (type) {
+            case MessageType.FROM:
+                holder = (ViewHolder) convertView.getTag();
+                break;
+            case MessageType.TO:
+                holder = (ViewHolder) convertView.getTag();
+                break;
+            default:
+                break;
+            }
         }
 
         holder.itemTime.setText(TimeModule.getTimeFormat());
@@ -122,12 +148,17 @@ public class ChatAdapter extends BaseAdapter {
         int contentType = mDatas.get(position).getContentType();
         switch (contentType) {
         case MessageContentType.TXT:
+            holder.itemVoiceView.setVisibility(View.GONE);
             holder.itemContentImg.setVisibility(View.GONE);
             holder.itemContentTxt.setVisibility(View.VISIBLE);
             
             holder.itemContentTxt.setText(mDatas.get(position).getContent());
+            ViewGroup.LayoutParams lp = holder.itemContentTxt.getLayoutParams();
+            lp.width = (int) (mMinItemWidth + (mMaxItemWidth / 60f)* mDatas.get(position).getContent().length());
+            holder.itemContentTxt.setLayoutParams(lp);
             break;
         case MessageContentType.IMG:
+            holder.itemVoiceView.setVisibility(View.GONE);
             holder.itemContentTxt.setVisibility(View.GONE);
             holder.itemContentImg.setVisibility(View.VISIBLE);
             
@@ -136,6 +167,7 @@ public class ChatAdapter extends BaseAdapter {
             holder.itemContentImg.setImageBitmap(bitmap);
             break;
         case MessageContentType.IMG_TXT:
+            holder.itemVoiceView.setVisibility(View.GONE);
             holder.itemContentTxt.setVisibility(View.VISIBLE);
             holder.itemContentImg.setVisibility(View.VISIBLE);
             
@@ -147,13 +179,19 @@ public class ChatAdapter extends BaseAdapter {
             }
             break;
         case MessageContentType.VOICE:
-            holder.itemVoice.setVisibility(View.VISIBLE);
+            holder.itemVoiceView.setVisibility(View.VISIBLE);
             holder.itemContentTxt.setVisibility(View.GONE);
             holder.itemContentImg.setVisibility(View.GONE);
-            holder.itemVoice.setOnClickListener(new OnClickListener() {
+            
+            holder.itemVoiceSeconds.setText(Math.round(mDatas.get(position).getRecorder().getSeconds())+"\"");
+            ViewGroup.LayoutParams lp1 = holder.itemVoiceView.getLayoutParams();
+            lp1.width = (int) (mMinItemWidth + (mMaxItemWidth / 60f)* mDatas.get(position).getRecorder().getSeconds());
+            holder.itemVoiceView.setLayoutParams(lp1);
+            
+            holder.itemVoiceView.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View arg0) {
-                    mListener.onVoiceClick(position);
+                public void onClick(View view) {
+                    mListener.onVoiceClick(view,position);
                 }
             });
             break;
@@ -165,12 +203,14 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        ImageView itemVoice;
+        View itemVoiceView;
+        View itemVoiceAnim;
+        TextView itemVoiceSeconds;
+        
         TextView itemTime;
         ImageView itemIcon;
         TextView itemContentTxt;
         ImageView itemContentImg;
-        int itemMsgType;
     }
 
 }

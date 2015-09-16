@@ -1,4 +1,5 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+
     <style name="CustomWindowAnimation" parent="@android:style/Animation.Activity">
 
         <!-- A to B, show B -->
@@ -35,7 +36,20 @@
         <item name="android:scrollingCache">false</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:cacheColorHint">#0000</item>
-        <!--<item name="android:stackFromBottom">true</item>-->
+        <!-- <item name="android:stackFromBottom">true</item> -->
+    </style>
+
+    <!-- 设置弹出窗口的属性，frame叠加，isfloat是否浮动，tarnslucent是否半透明，dim是背景是否变暗 -->
+    <style name="Theme_audioDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="Theme_EditText" parent="@android:style/Widget.EditText">
+        <item name="android:background">@drawable/chat_edit_text_selector</item>
     </style>
 
 </resources>

@@ -5,16 +5,22 @@
     <color name="color_red">#FF0000</color>
     <color name="color_green">#00FF00</color>
     <color name="thumbColor">#66aaaaaa</color>
+    <color name="color_dark_gray">#727272</color>
+    <color name="color_light_gray">#E2E2E2</color>
     
     <color name="color_transparent">#00000000</color>
     <color name="txt_ea">#EAEAEA</color>
+    
+    <!-- bottom -->
+    <color name="color_bottom">#FEFEFE</color>
     <!-- bars -->
-    <color name="toolbarcolor">#f0f0f0</color>
+    <color name="toolbarcolor">#22292C</color>
     <color name="color_text_gray">#818181</color>
     <color name="transparent">#00000000</color>
     <color name="font434343">#434343</color>
-
+	
     <!-- listview -->
+    <color name="color_list_bac">#EBEBEB</color>
     <color name="color_listitem_default">#FFFFFF</color>
     <color name="color_listitem_selected">#F2F2F2</color>
     <color name="color_listview_divider">#555555</color>

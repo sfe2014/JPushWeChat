@@ -3,11 +3,19 @@
     <string name="app_name">Liao</string>
     <string name="activity_imge_fullscreen">Image FullScreen</string>
     <string name="btn_cancel">Cancel</string>
-	<string name="btn_ok">OK</string>
-	<string name="modify_icon_dialog_title">Choose Photos</string>
-	<string-array name="modify_icon_dialog_choices">
-	    <item >Camera</item>
-	    <item >Picture</item>
-	    <item >Cancel</item>
-	</string-array>
+    <string name="btn_ok">OK</string>
+    <string name="modify_icon_dialog_title">Choose Photos</string>
+
+    <string-array name="modify_icon_dialog_choices">
+        <item>Camera</item>
+        <item>Picture</item>
+        <item>Cancel</item>
+    </string-array>
+
+    <string name="voice_button_pressed_up">Release to Send</string>
+    <string name="voice_button_pressed_down">Hold to Talk</string>
+    <string name="voice_recording">手指上滑，取消发送</string>
+    <string name="voice_record_cancel">松开手指，取消发送</string>
+    <string name="voice_record_too_short">录音时间过短</string>
+
 </resources>
