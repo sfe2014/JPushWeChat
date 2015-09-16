@@ -11,7 +11,7 @@
     <dimen name="topbar_height">50.0dp</dimen>
 
     <!-- listview -->
-    <dimen name="listview_divider_height">0.5dp</dimen>
+    <dimen name="listview_divider_height">5dp</dimen>
     
     <!-- chat adapter -->
     <dimen name="chat_icon_height">36dp</dimen>

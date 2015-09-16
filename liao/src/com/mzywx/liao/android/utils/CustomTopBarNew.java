@@ -44,15 +44,15 @@ public class CustomTopBarNew extends RelativeLayout {
     private void init() {
 
         mainItemLayout = (RelativeLayout) findViewById(R.id.mainItemLayout);
-        leftLayout = (LinearLayout) findViewById(R.id.topbarLeftLinearLayout);
-        rightButton = (ImageButton) findViewById(R.id.topbarRightImageButton);
-        rightTextView = (TextView) findViewById(R.id.topbarRightTextView);
+        leftLayout = (LinearLayout) findViewById(R.id.id_topbarLeftLinearLayout);
+        rightButton = (ImageButton) findViewById(R.id.id_topbarRightImageButton);
+        rightTextView = (TextView) findViewById(R.id.id_topbarRightTextView);
 
         leftLayout.setOnClickListener(new MyViewOnClickListener());
         rightButton.setOnClickListener(new MyViewOnClickListener());
         rightTextView.setOnClickListener(new MyViewOnClickListener());
 
-        topTitleTextView = (TextView) findViewById(R.id.topbarTitle);
+        topTitleTextView = (TextView) findViewById(R.id.id_topbarTitle);
         topTitleTextView.setOnClickListener(new MyViewOnClickListener());
     }
 
@@ -72,11 +72,11 @@ public class CustomTopBarNew extends RelativeLayout {
                                     int backTitleColorResId) {
         if (leftLayout != null) {
             if (backImageResId > 0) {
-                ImageView backImage = (ImageView) findViewById(R.id.topbarLeftBackImageView);
+                ImageView backImage = (ImageView) findViewById(R.id.id_topbarLeftBackImageView);
                 backImage.setImageResource(backImageResId);
             }
 
-            TextView backTitle = (TextView) findViewById(R.id.topbarLeftBackTitle);
+            TextView backTitle = (TextView) findViewById(R.id.id_topbarLeftBackTitle);
             if (backTitleResId > 0) {
                 backTitle.setText(backTitleResId);
             }
@@ -184,20 +184,20 @@ public class CustomTopBarNew extends RelativeLayout {
         @Override
         public void onClick(View v) {
             int rid = v.getId();
-            if (rid == R.id.topbarLeftLinearLayout) {
+            if (rid == R.id.id_topbarLeftLinearLayout) {
                 if (onTopbarNewLeftLayoutListener != null) {
                     onTopbarNewLeftLayoutListener.onTopbarLeftLayoutSelected();
                 }
-            } else if (rid == R.id.topbarRightImageButton) {
+            } else if (rid == R.id.id_topbarRightImageButton) {
                 if (onTopbarNewRightButtonListener != null) {
                     onTopbarNewRightButtonListener
                             .onTopbarRightButtonSelected();
                 }
-            } else if (rid == R.id.topbarTitle) {
+            } else if (rid == R.id.id_topbarTitle) {
                 if (onTopbarNewCenterListener != null) {
                     onTopbarNewCenterListener.onTopbarCenterSelected();
                 }
-            } else if (rid == R.id.topbarRightTextView) {
+            } else if (rid == R.id.id_topbarRightTextView) {
                 if (onTopbarNewRightButtonListener != null) {
                     onTopbarNewRightButtonListener
                             .onTopbarRightButtonSelected();

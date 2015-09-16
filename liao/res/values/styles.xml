@@ -33,6 +33,9 @@
         <item name="android:listSelector">#00000000</item>
         <item name="android:fadingEdge">none</item>
         <item name="android:scrollingCache">false</item>
+        <item name="android:scrollbarStyle">outsideOverlay</item>
+        <item name="android:cacheColorHint">#0000</item>
+        <!--<item name="android:stackFromBottom">true</item>-->
     </style>
 
 </resources>
