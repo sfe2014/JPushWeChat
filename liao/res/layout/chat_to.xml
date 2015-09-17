@@ -13,50 +13,63 @@
         android:textSize="12sp"
         android:visibility="gone" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/id_chat_item_to_time"
-        android:orientation="horizontal" >
+        android:layout_below="@id/id_chat_item_to_time" >
+
+        <ImageView
+            android:id="@+id/id_chat_item_to_user_icon"
+            android:layout_width="@dimen/chat_icon_width"
+            android:layout_height="@dimen/chat_icon_height"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_chat_to_usericon" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center" >
+            android:layout_toLeftOf="@id/id_chat_item_to_user_icon"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical" >
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/id_chat_item_to_content_voice_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
-                android:orientation="horizontal"
                 android:background="@drawable/ic_chat_to_background"
+                android:gravity="center_vertical"
                 android:visibility="gone" >
 
                 <TextView
                     android:id="@+id/id_chat_item_to_content_voice_seconds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="8dp"
                     android:singleLine="true"
-                    android:textColor="@color/color_text_gray"
-                    android:layout_gravity="center_vertical" />
+                    android:textColor="@color/color_text_gray" />
 
                 <View
                     android:id="@+id/id_chat_item_to_content_voice_anim"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:scaleType="centerInside"
-                    android:background="@drawable/ic_chat_voice_to" />
-            </LinearLayout>
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/ic_chat_voice_to"
+                    android:scaleType="centerInside" />
+            </RelativeLayout>
 
             <ImageView
                 android:id="@+id/id_chat_item_to_content_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/back_chat_to_shape"
                 android:layout_margin="3dp"
+                android:background="@drawable/ic_chat_to_background"
                 android:scaleType="centerInside"
                 android:visibility="gone" />
 
@@ -65,21 +78,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/id_chat_item_to_content_img"
-                android:layout_margin="3dp"
                 android:background="@drawable/ic_chat_to_background"
                 android:gravity="center"
+                android:paddingLeft="3dp"
+                android:paddingRight="8dp"
                 android:textIsSelectable="false" >
             </TextView>
         </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/id_chat_item_to_user_icon"
-            android:layout_width="@dimen/chat_icon_width"
-            android:layout_height="@dimen/chat_icon_height"
-            android:layout_margin="3dp"
-            android:scaleType="centerInside"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_chat_to_usericon" />
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

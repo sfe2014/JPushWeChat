@@ -8,7 +8,8 @@
     <color name="color_dark_gray">#727272</color>
     <color name="color_light_gray">#E2E2E2</color>
     
-    <color name="color_transparent">#00000000</color>
+    <color name="color_transparent">#00000000</color><!-- 全透明黑色 -->
+    <color name="color_btn_normal">#45C01A</color>
     <color name="txt_ea">#EAEAEA</color>
     
     <!-- bottom -->

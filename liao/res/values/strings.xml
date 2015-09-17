@@ -17,5 +17,7 @@
     <string name="voice_recording">手指上滑，取消发送</string>
     <string name="voice_record_cancel">松开手指，取消发送</string>
     <string name="voice_record_too_short">录音时间过短</string>
+    <string name="image_fullscreen_title">图片</string>
+    <string name="app_back">返回</string>
 
 </resources>

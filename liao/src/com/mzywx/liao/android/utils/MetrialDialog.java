@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.mzywx.liao.android.R;
 
-public class Dialog extends android.app.Dialog{
+public class MetrialDialog extends android.app.Dialog{
     
     Context context;
     View view;
@@ -32,7 +32,7 @@ public class Dialog extends android.app.Dialog{
     View.OnClickListener onAcceptButtonClickListener;
     View.OnClickListener onCancelButtonClickListener;
     
-    public Dialog(Context context,String title, String message) {
+    public MetrialDialog(Context context,String title, String message) {
         super(context, android.R.style.Theme_Translucent);
         this.context = context;// init Context
         this.message = message;
@@ -53,7 +53,7 @@ public class Dialog extends android.app.Dialog{
       protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog);
+        setContentView(R.layout.metrial_dialog);
         
         view = (RelativeLayout)findViewById(R.id.contentDialog);
         backView = (RelativeLayout)findViewById(R.id.dialog_rootView);
@@ -200,7 +200,7 @@ public class Dialog extends android.app.Dialog{
                 view.post(new Runnable() {
                     @Override
                     public void run() {
-                        Dialog.super.dismiss();
+                        MetrialDialog.super.dismiss();
                     }
                 });
                 

@@ -19,6 +19,7 @@ import com.mzywx.liao.android.utils.AudioRecorderButton;
 import com.mzywx.liao.android.utils.AudioRecorderButton.AudioFinishRecorderListener;
 import com.mzywx.liao.android.utils.CameraUtils;
 import com.mzywx.liao.android.utils.CustomTopBarNew;
+import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
 import com.mzywx.liao.android.utils.ImageUtils;
 
 import android.app.Activity;
@@ -31,11 +32,8 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -48,17 +46,14 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 public class LiaoChatActivity extends Activity implements
-        OnLayoutChangeListener, VoiceClickListener {
+        OnLayoutChangeListener, VoiceClickListener,OnTopbarNewLeftLayoutListener {
 
     private static final int PICK_IMAGE = 0x10;
     private static final int PICK_CAMERA = 0x11;
@@ -81,8 +76,8 @@ public class LiaoChatActivity extends Activity implements
 
     private EditText mContentEdit;
     private Button mSendButton;
-    private ImageButton mAddPictureButton;
-    private ImageButton mVoiceToggleButton;
+    private ImageView mAddPictureButton;
+    private ImageView mVoiceToggleButton;
     private AudioRecorderButton mVoiceButton;
 
     private String mContentString;
@@ -161,9 +156,9 @@ public class LiaoChatActivity extends Activity implements
         mContentEdit.addTextChangedListener(new ContentWatcher());
         mSendButton = (Button) findViewById(R.id.id_chat_main_send);
         mSendButton.setOnClickListener(mOnClickListener);
-        mAddPictureButton = (ImageButton) findViewById(R.id.id_chat_main_add);
+        mAddPictureButton = (ImageView) findViewById(R.id.id_chat_main_add);
         mAddPictureButton.setOnClickListener(mOnClickListener);
-        mVoiceToggleButton = (ImageButton) findViewById(R.id.id_chat_main_voice);
+        mVoiceToggleButton = (ImageView) findViewById(R.id.id_chat_main_voice);
         mVoiceToggleButton.setOnClickListener(mOnClickListener);
         mVoiceButton = (AudioRecorderButton) findViewById(R.id.id_chat_main_record);
         mVoiceButton
@@ -182,7 +177,7 @@ public class LiaoChatActivity extends Activity implements
     private void initTopBar() {
         CustomTopBarNew topbar = (CustomTopBarNew) findViewById(R.id.topbar);
         topbar.setTopbarTitle("LiaoChat");
-        topbar.setTopbarLeftLayoutHide();
+        topbar.setonTopbarNewLeftLayoutListener(this);
     }
 
     private void initDatas() {
@@ -198,7 +193,10 @@ public class LiaoChatActivity extends Activity implements
         mDatas.add(new ChatMessage(MessageType.TO, "熊市", MessageContentType.TXT));
         mDatas.add(new ChatMessage(MessageType.TO, "奥巴马",
                 MessageContentType.TXT));
-        mDatas.add(new ChatMessage(MessageType.TO, "维多利亚",
+        mDatas.add(new ChatMessage(MessageType.TO, "维多利亚空间卡机看到财政科学决策啃老族靠自己吃亏了在开罗机场客流" +
+        		"akdladlkjkzcjkj kljlk会计控制出口在开罗城阚凯力今年看来大家快来进口料件看来大家阿奎拉加德刻录机看来只能参考你、" +
+        		"打开了大家快拉加德卡拉健康了今年在开罗城今年刻录机阿奎拉得很考核快拉政策性" +
+        		"大家都快lad刻录机阿奎随即打开就doi全景网i哦即将召开程序可空间打开了期间的快乐健康金卡了大家快接啊肯德基",
                 MessageContentType.TXT));
         mChatAdapter.notifyDataSetChanged();
     }
@@ -440,19 +438,20 @@ public class LiaoChatActivity extends Activity implements
     }
 
     View animView;
+    private int previouceMessageType = -1;
 
     @Override
     public void onVoiceClick(View view, int position) {
         final int messageType = mDatas.get(position).getType();
-        if (animView != null) {
+        if (animView != null && previouceMessageType == messageType) {
             if (messageType == MessageType.FROM) {
                 animView.setBackgroundResource(R.drawable.ic_chat_voice_from);
-                animView = view.findViewById(R.id.id_chat_item_from_content_voice_anim);
             } else if (messageType == MessageType.TO) {
                 animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
-                animView = view.findViewById(R.id.id_chat_item_to_content_voice_anim);
             }
+            animView = null;
         }
+        previouceMessageType = messageType;
         if (messageType == MessageType.FROM) {
             animView = view.findViewById(R.id.id_chat_item_from_content_voice_anim);
         } else if (messageType == MessageType.TO) {
@@ -461,21 +460,37 @@ public class LiaoChatActivity extends Activity implements
         animView.setBackgroundResource(R.drawable.recoder_play);
         final AnimationDrawable drawable = (AnimationDrawable) animView
                 .getBackground();
-        drawable.setOneShot(false);
         drawable.start();
 
         String filePath = mDatas.get(position).getRecorder().getFilePath();
-        MediaManager.playSound(filePath, new OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer arg0) {
-                drawable.stop();
-                if (messageType == MessageType.FROM) {
-                    animView.setBackgroundResource(R.drawable.ic_chat_voice_from);
-                } else if (messageType == MessageType.TO) {
-                    animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
-                }
-            }
-        });
+        try {
+			MediaManager.playSound(filePath, new OnCompletionListener() {
+			    @Override
+			    public void onCompletion(MediaPlayer arg0) {
+			        drawable.stop();
+			        if (messageType == MessageType.FROM) {
+			            animView.setBackgroundResource(R.drawable.ic_chat_voice_from);
+			        } else if (messageType == MessageType.TO) {
+			            animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
+			        }
+			    }
+			});
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(this, "Sorry,未找到语音文件", Toast.LENGTH_SHORT).show();
+	        drawable.stop();
+	        if (messageType == MessageType.FROM) {
+	            animView.setBackgroundResource(R.drawable.ic_chat_voice_from);
+	        } else if (messageType == MessageType.TO) {
+	            animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
+	        }
+		}
     }
 
     public class MessageReceiver extends BroadcastReceiver {
@@ -523,5 +538,10 @@ public class LiaoChatActivity extends Activity implements
             }
         }
     }
+
+	@Override
+	public void onTopbarLeftLayoutSelected() {
+		this.finish();
+	}
 
 }

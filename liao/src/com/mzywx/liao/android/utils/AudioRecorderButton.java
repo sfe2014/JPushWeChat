@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -43,6 +44,7 @@ public class AudioRecorderButton extends Button {
     private Runnable mGetVoiceLevelRunnable = new Runnable() {
 
         public void run() {
+        	Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
             while (isRecording) {
                 try {
                     Thread.sleep(100);
@@ -61,6 +63,7 @@ public class AudioRecorderButton extends Button {
         public void handleMessage(Message msg) {
             switch (msg.what) {
             case MSG_AUDIO_PREPARED:
+            	Log.d("mikes", "audio prepared");
                 // 显示对话框在开始录音以后
                 mDialogManager.showRecordingDialog();
                 isRecording = true;

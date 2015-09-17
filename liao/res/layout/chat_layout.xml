@@ -15,19 +15,20 @@
     <RelativeLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/bottom_height"
         android:layout_alignParentBottom="true"
         android:background="@color/color_bottom" >
 
-        <ImageButton
+        <ImageView
             android:id="@+id/id_chat_main_voice"
-            android:layout_width="56dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:background="@null"
+            android:layout_margin="5dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_chat_voice_button" />
+            android:src="@drawable/ic_chat_voice_button"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/id_chat_main_btn_bottom"
@@ -44,36 +45,36 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp" >
+                android:layout_centerVertical="true" >
 
                 <Button
                     android:id="@+id/id_chat_main_send"
                     android:layout_width="56dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:background="@drawable/back_send_selector"
                     android:text="发送"
                     android:textColor="@color/color_white"
                     android:visibility="gone" >
                 </Button>
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/id_chat_main_add"
-                    android:layout_width="56dp"
-                    android:layout_height="40dp"
-                    android:background="@null"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_chat_add" />
+                    android:src="@drawable/ic_chat_add"
+                    tools:ignore="ContentDescription" />
             </FrameLayout>
 
             <EditText
                 android:id="@+id/id_chat_main_edit"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                style="@style/Theme_EditText"
-                android:layout_margin="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_toLeftOf="@id/id_chat_main_send_layout"
                 android:inputType="text" >
             </EditText>
@@ -82,7 +83,7 @@
         <com.mzywx.liao.android.utils.AudioRecorderButton
             android:id="@+id/id_chat_main_record"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_margin="8dp"
@@ -102,20 +103,5 @@
         android:layout_above="@id/bottom"
         android:layout_below="@id/topbar" >
     </ListView>
-
-    <!-- 录音显示UI层 -->
-    <!--
-    <LinearLayout
-        android:id="@+id/chat_popup"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center"
-        android:visibility="gone" >
-
-        <include
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-    </LinearLayout>    -->
 
 </RelativeLayout>

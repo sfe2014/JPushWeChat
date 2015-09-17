@@ -31,7 +31,7 @@ public class CameraUtils {
                 IMAGE_TYPE);
 
         Intent chooseIntent = Intent.createChooser(takePhotoIntent,
-                "选择一种应用设置头像");
+                "选择一种应用");
         chooseIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
                 new Intent[] { pickIntent });
         activity.startActivityForResult(chooseIntent, requestCode);

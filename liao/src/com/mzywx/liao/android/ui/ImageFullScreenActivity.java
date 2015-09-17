@@ -39,9 +39,10 @@ public class ImageFullScreenActivity extends Activity implements OnTopbarNewLeft
     
     private void initTopBar() {
         CustomTopBarNew topbar = (CustomTopBarNew) findViewById(R.id.id_chat_fullscreen_topbar);
-        topbar.setTopbarTitle("图片");
+        topbar.setTopbarTitle(R.string.image_fullscreen_title);
         topbar.setonTopbarNewLeftLayoutListener(this);
         topbar.setRightText("发送");
+        topbar.setRightTextColor(getResources().getColor(R.color.color_white));
         topbar.setOnTopbarNewRightButtonListener(this);
     }
 

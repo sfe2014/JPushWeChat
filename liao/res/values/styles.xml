@@ -39,13 +39,15 @@
         <!-- <item name="android:stackFromBottom">true</item> -->
     </style>
 
-    <!-- 设置弹出窗口的属性，frame叠加，isfloat是否浮动，tarnslucent是否半透明，dim是背景是否变暗 -->
+    <!-- 录音时对话框属性 -->
     <style name="Theme_audioDialog" parent="@android:style/Theme.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:background">@drawable/dialog_loading_bg</item>
+        <item name="android:windowBackground">@null</item>
     </style>
 
     <style name="Theme_EditText" parent="@android:style/Widget.EditText">

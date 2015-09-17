@@ -115,9 +115,9 @@ public class AudioManager {
      * 释放资源
      */
     public void release() {
-        mMediaRecorder.stop();
-        mMediaRecorder.release();
-//        mMediaRecorder.reset();
+//        mMediaRecorder.stop();
+//        mMediaRecorder.release();
+        mMediaRecorder.reset();
         mMediaRecorder = null;
     }
 

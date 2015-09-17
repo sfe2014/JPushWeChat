@@ -9,6 +9,7 @@
 
     <!-- bars -->
     <dimen name="topbar_height">50.0dp</dimen>
+    <dimen name="bottom_height">48.0dp</dimen>
 
     <!-- listview -->
     <dimen name="listview_divider_height">5dp</dimen>

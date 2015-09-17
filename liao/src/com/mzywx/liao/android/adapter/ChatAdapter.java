@@ -144,6 +144,7 @@ public class ChatAdapter extends BaseAdapter {
         }
 
         holder.itemTime.setText(TimeModule.getTimeFormat());
+        holder.itemContentTxt.setMaxWidth(mMaxItemWidth);
 
         int contentType = mDatas.get(position).getContentType();
         switch (contentType) {
@@ -153,9 +154,6 @@ public class ChatAdapter extends BaseAdapter {
             holder.itemContentTxt.setVisibility(View.VISIBLE);
             
             holder.itemContentTxt.setText(mDatas.get(position).getContent());
-            ViewGroup.LayoutParams lp = holder.itemContentTxt.getLayoutParams();
-            lp.width = (int) (mMinItemWidth + (mMaxItemWidth / 60f)* mDatas.get(position).getContent().length());
-            holder.itemContentTxt.setLayoutParams(lp);
             break;
         case MessageContentType.IMG:
             holder.itemVoiceView.setVisibility(View.GONE);
