@@ -1,5 +1,6 @@
 package com.mzywx.liao.android.adapter;
 
+import java.io.File;
 import java.util.List;
 
 import com.mzywx.liao.android.R;
@@ -59,7 +60,7 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         ChatMessage msg = mDatas.get(position);
-        if (msg.getType() == MessageType.FROM) {
+        if (msg.getMessageType() == MessageType.FROM) {
             return MessageType.FROM;
         } else {
             return MessageType.TO;
@@ -84,7 +85,7 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup arg2) {
         final ChatMessage msg = mDatas.get(position);
-        int type = msg.getType();
+        int type = msg.getMessageType();
         ViewHolder holder = new ViewHolder();
         if (convertView == null) {
             holder = new ViewHolder();
@@ -145,6 +146,7 @@ public class ChatAdapter extends BaseAdapter {
 
         holder.itemTime.setText(TimeModule.getTimeFormat());
         holder.itemContentTxt.setMaxWidth(mMaxItemWidth);
+        holder.itemContentImg.setMaxWidth(mMaxItemWidth);
 
         int contentType = mDatas.get(position).getContentType();
         switch (contentType) {
@@ -153,27 +155,16 @@ public class ChatAdapter extends BaseAdapter {
             holder.itemContentImg.setVisibility(View.GONE);
             holder.itemContentTxt.setVisibility(View.VISIBLE);
             
-            holder.itemContentTxt.setText(mDatas.get(position).getContent());
+            holder.itemContentTxt.setText(mDatas.get(position).getContentText());
             break;
         case MessageContentType.IMG:
             holder.itemVoiceView.setVisibility(View.GONE);
             holder.itemContentTxt.setVisibility(View.GONE);
             holder.itemContentImg.setVisibility(View.VISIBLE);
             
-            Bitmap bitmap = (Bitmap) mDatas.get(position).getContentImage()
-                    .getParcelable("bitmap");
-            holder.itemContentImg.setImageBitmap(bitmap);
-            break;
-        case MessageContentType.IMG_TXT:
-            holder.itemVoiceView.setVisibility(View.GONE);
-            holder.itemContentTxt.setVisibility(View.VISIBLE);
-            holder.itemContentImg.setVisibility(View.VISIBLE);
-            
-            holder.itemContentTxt.setText(mDatas.get(position).getContent());
-            holder.itemContentImg.setVisibility(View.VISIBLE);
-            String icon = mDatas.get(position).getContentImageUrl();
-            if (!TextUtils.isEmpty(icon)) {
-                Picasso.with(mContext).load(icon).into(holder.itemContentImg);
+            String imagePath = mDatas.get(position).getContentImage();
+            if (!TextUtils.isEmpty(imagePath)) {
+                Picasso.with(mContext).load(new File(imagePath)).into(holder.itemContentImg);
             }
             break;
         case MessageContentType.VOICE:

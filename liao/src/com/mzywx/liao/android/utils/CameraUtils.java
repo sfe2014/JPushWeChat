@@ -1,6 +1,8 @@
 package com.mzywx.liao.android.utils;
 
 import java.io.File;
+import java.util.UUID;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -58,11 +60,20 @@ public class CameraUtils {
      * @param photoFile
      *            拍照完毕时,图片保存的位置
      */
-    public static void openCamera(Activity activity, int requestCode,
-            File photoFile) {
+    public static String openCamera(Activity activity, int requestCode,
+            String  photoFilePath) {
+    	String filePath = photoFilePath + generateFileName();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(filePath)));
         activity.startActivityForResult(intent, requestCode);
+        return filePath;
+    }
+    
+    /**
+     * 随机生成文件的名称
+     */
+    private static String generateFileName() {
+        return UUID.randomUUID().toString() + ".jpg";
     }
 
     /**

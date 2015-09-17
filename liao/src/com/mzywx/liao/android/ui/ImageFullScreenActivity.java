@@ -1,9 +1,12 @@
 package com.mzywx.liao.android.ui;
 
+import java.io.File;
+
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.utils.CustomTopBarNew;
 import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
 import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewRightButtonListener;
+import com.squareup.picasso.Picasso;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -29,8 +32,8 @@ public class ImageFullScreenActivity extends Activity implements OnTopbarNewLeft
         try {
             Intent intent=getIntent();
             if (intent != null) {
-                Bitmap bitmap = (Bitmap)intent.getParcelableExtra("bitmap");
-                mImageView.setImageBitmap(bitmap);
+            	String filePath = intent.getStringExtra("imageUri");
+            	Picasso.with(this).load(new File(filePath)).into(mImageView);
             }
         } catch (ClassCastException e) {
             Log.e("mikes", "e:",e);

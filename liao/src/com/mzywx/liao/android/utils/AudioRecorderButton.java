@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
+import com.mzywx.liao.android.AppContext;
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.model.AudioManager;
 import com.mzywx.liao.android.model.AudioManager.AudioStateListener;
@@ -89,7 +90,7 @@ public class AudioRecorderButton extends Button {
         super(context, attrs);
         mDialogManager = new AudioDialogManager(context);
  
-        String dir = "/storage/sdcard0/liao_chat";
+        String dir = AppContext.VOICE_PATH;
 //        String dir = Environment.getExternalStorageDirectory()+"/liao_chat";
  
         mAudioManager = AudioManager.getInstance(dir);
