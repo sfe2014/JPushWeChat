@@ -3,17 +3,17 @@
     android:oneshot="false" >
 
     <item
-        android:drawable="@drawable/v_anim1"
+        android:drawable="@drawable/v_to_anim1"
         android:duration="300">
     </item>
     
     <item
-        android:drawable="@drawable/v_anim2"
+        android:drawable="@drawable/v_to_anim2"
         android:duration="300">
     </item>
     
     <item
-        android:drawable="@drawable/v_anim3"
+        android:drawable="@drawable/v_to_anim3"
         android:duration="300">
     </item>
 

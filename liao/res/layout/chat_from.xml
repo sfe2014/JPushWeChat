@@ -11,7 +11,7 @@
         android:gravity="center"
         android:textColor="@color/color_text_gray"
         android:textSize="12sp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginLeft="3dp"
                     android:background="@drawable/ic_chat_voice_from"
                     android:scaleType="centerInside" />
 
@@ -59,7 +59,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="8dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="3dp"
                     android:singleLine="true"
                     android:textColor="@color/color_text_gray" />
             </RelativeLayout>

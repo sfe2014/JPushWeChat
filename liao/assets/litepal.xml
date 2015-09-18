@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+
+    <dbname value="liao" >
+    </dbname>
+
+    <version value="4" >
+    </version>
+
+    <list>
+
+        <mapping class="com.mzywx.liao.android.model.ChatMessage" >
+        </mapping>
+
+        <mapping class="com.mzywx.liao.android.model.Recorder" >
+        </mapping>
+    </list>
+
+</litepal>

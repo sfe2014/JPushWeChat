@@ -1,7 +1,9 @@
 package com.mzywx.liao.android.model;
 
-import org.litepal.crud.DataSupport;
+import java.util.Date;
+import java.util.List;
 
+import org.litepal.crud.DataSupport;
 
 public class ChatMessage extends DataSupport {
 
@@ -17,7 +19,7 @@ public class ChatMessage extends DataSupport {
 		public static final int VOICE = 2;// 语音
 	}
 
-	private int messageId;// 消息ID
+	private int id;// 消息ID
 	/**
 	 * 消息类型
 	 */
@@ -33,10 +35,9 @@ public class ChatMessage extends DataSupport {
 
 	private String contentImage;// 图片地址
 
-	private float contentRecordDuration;// 语音时长
-	private String contentRecordPath;// 语音路径
+	private Date messageDate;// 消息时间
 
-	protected Recorder recorder;
+	private Recorder recorder;
 
 	/**
 	 * 发送文字
@@ -64,6 +65,8 @@ public class ChatMessage extends DataSupport {
 	 *            图片链接
 	 * @param contentType
 	 *            内容类型
+	 * @param flag
+	 *            重载
 	 */
 	public ChatMessage(int messageType, String contentImage, int contentType,
 			int flag) {
@@ -84,17 +87,15 @@ public class ChatMessage extends DataSupport {
 		super();
 		this.messageType = type;
 		this.recorder = recorder;
-		this.contentRecordDuration = recorder.getSeconds();
-		this.contentRecordPath = recorder.getFilePath();
 		this.contentType = contentType;
 	}
 
-	public int getMessageId() {
-		return messageId;
+	public int getId() {
+		return id;
 	}
 
-	public void setMessageId(int messageId) {
-		this.messageId = messageId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public int getMessageType() {
@@ -129,28 +130,33 @@ public class ChatMessage extends DataSupport {
 		this.contentImage = contentImage;
 	}
 
-	public float getContentRecordDuration() {
-		return contentRecordDuration;
-	}
-
-	public void setContentRecordDuration(float contentRecordDuration) {
-		this.contentRecordDuration = contentRecordDuration;
-	}
-
-	public String getContentRecordPath() {
-		return contentRecordPath;
-	}
-
-	public void setContentRecordPath(String contentRecordPath) {
-		this.contentRecordPath = contentRecordPath;
-	}
-
 	public Recorder getRecorder() {
 		return recorder;
 	}
 
 	public void setRecorder(Recorder recorder) {
 		this.recorder = recorder;
+	}
+
+	public List<Recorder> getRecorders() {
+		return DataSupport.where("chatmessage_id = ?", String.valueOf(id))
+				.find(Recorder.class);
+	}
+
+	public Date getMessageDate() {
+		return messageDate;
+	}
+
+	public void setMessageDate(Date messageDate) {
+		this.messageDate = messageDate;
+	}
+
+	@Override
+	public String toString() {
+		return "ChatMessage [id=" + id + ", messageType=" + messageType
+				+ ", contentType=" + contentType + ", contentText="
+				+ contentText + ", contentImage=" + contentImage
+				+ ", recorder=" + recorder + "]";
 	}
 
 }

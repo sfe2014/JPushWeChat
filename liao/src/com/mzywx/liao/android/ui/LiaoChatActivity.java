@@ -3,11 +3,12 @@ package com.mzywx.liao.android.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.litepal.crud.DataSupport;
 import cn.jpush.android.api.JPushInterface;
 
-import com.mzywx.liao.android.AppContext;
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.adapter.ChatAdapter;
 import com.mzywx.liao.android.adapter.ChatAdapter.VoiceClickListener;
@@ -67,7 +68,7 @@ public class LiaoChatActivity extends Activity implements
 
 	private static final int ICON_WIDTH_AND_HEIGHT = 200;
 
-	private String mCameraPhotoPath = "";
+	private String mCameraPhotoPath = "";//当前图片路径
 
 	private View mRootView;
 	private View mBottomView;
@@ -99,12 +100,12 @@ public class LiaoChatActivity extends Activity implements
 	private MessageReceiver mMessageReceiver;
 	public static final String MESSAGE_RECEIVED_ACTION = "com.example.jpushdemo.MESSAGE_RECEIVED_ACTION";
 	public static final String KEY_TITLE = "title";
-	public static final String KEY_MESSAGE = "message";
+	public static final String KEY_MESSAGE = "message";//自定义消息中的文本
 	public static final String KEY_EXTRAS = "extras";
 	public static final String KEY_IMG = "img";// 自定义消息中的图片
 	public static final String KEY_VOICE = "voice";// 自定义消息中的语音
 
-	private DbQueryHelper db = DbQueryHelper.getInstance();
+	private DbQueryHelper db = DbQueryHelper.getInstance();//打开数据库 若没有就创建
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,31 +117,30 @@ public class LiaoChatActivity extends Activity implements
 
 		init();
 		initDatas();
-		// DbQueryHelper.checkDatabase(this);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		MediaManager.resume();
 		JPushInterface.onResume(this);
 		isForeground = true;
 		mRootView.addOnLayoutChangeListener(this);
-		MediaManager.resume();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		MediaManager.pause();
 		isForeground = false;
 		JPushInterface.onPause(this);
-		MediaManager.pause();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		unregisterReceiver(mMessageReceiver);
 		MediaManager.release();
+		unregisterReceiver(mMessageReceiver);
 	}
 
 	public void registerMessageReceiver() {
@@ -176,10 +176,16 @@ public class LiaoChatActivity extends Activity implements
 					@Override
 					public void onFinish(float seconds, String filePath) {// 录音完成后的回调
 						Recorder recorder = new Recorder(seconds, filePath);
-						mDatas.add(new ChatMessage(MessageType.TO, recorder,
-								MessageContentType.VOICE));
+						recorder.save();
+						ChatMessage recordMessage = new ChatMessage(MessageType.TO, recorder,
+								MessageContentType.VOICE);
+						recordMessage.save();
+						
+						mDatas.add(recordMessage);
 						mChatAdapter.notifyDataSetChanged();
 						setListViewPos(mChatAdapter.getCount());
+						Log.d("mikes", "add Voice: message id="+recordMessage.getId()
+								+",record id="+recordMessage.getRecorder().getId());
 					}
 				});
 	}
@@ -195,25 +201,15 @@ public class LiaoChatActivity extends Activity implements
 		mChatListView.setAdapter(mChatAdapter);
 		mChatListView.setOnScrollListener(mListViewScrollListener);
 
-		List<ChatMessage> messagesList = db.query("");// 暂时是空
+		List<ChatMessage> messagesList = DataSupport.findAll(ChatMessage.class);
+		for (ChatMessage chatMessage : messagesList) {
+			List<Recorder> recorders = chatMessage.getRecorders();
+			if (recorders.size() > 0) {
+				System.out.println(recorders.toString());
+				chatMessage.setRecorder(recorders.get(0));
+			}
+		}
 		mDatas.addAll(messagesList);
-		// mDatas.add(new ChatMessage(MessageType.FROM, "牛市",
-		// MessageContentType.TXT));
-		// mDatas.add(new ChatMessage(MessageType.TO, "熊市",
-		// MessageContentType.TXT));
-		// mDatas.add(new ChatMessage(MessageType.FROM, "牛市",
-		// MessageContentType.TXT));
-		// mDatas.add(new ChatMessage(MessageType.TO, "熊市",
-		// MessageContentType.TXT));
-		// mDatas.add(new ChatMessage(MessageType.TO, "奥巴马",
-		// MessageContentType.TXT));
-		// mDatas.add(new ChatMessage(MessageType.TO,
-		// "维多利亚空间卡机看到财政科学决策啃老族靠自己吃亏了在开罗机场客流" +
-		// "akdladlkjkzcjkj kljlk会计控制出口在开罗城阚凯力今年看来大家快来进口料件看来大家阿奎拉加德刻录机看来只能参考你、"
-		// +
-		// "打开了大家快拉加德卡拉健康了今年在开罗城今年刻录机阿奎拉得很考核快拉政策性" +
-		// "大家都快lad刻录机阿奎随即打开就doi全景网i哦即将召开程序可空间打开了期间的快乐健康金卡了大家快接啊肯德基",
-		// MessageContentType.TXT));
 		mChatAdapter.notifyDataSetChanged();
 	}
 
@@ -250,7 +246,7 @@ public class LiaoChatActivity extends Activity implements
 				break;
 			case PICK_CAMERA:
 				Log.d("mikes",
-						"result data:" + data.toString() + ",uri="
+						"result data:" + data.getData().toString() + ",uri="
 								+ Uri.fromFile(new File(mCameraPhotoPath)));
 				// mBitmap = (Bitmap) data.getExtras().get("data");
 				break;
@@ -306,10 +302,12 @@ public class LiaoChatActivity extends Activity implements
 	private void addTxt(int messageType, String content) {
 		ChatMessage message = new ChatMessage(messageType, content,
 				MessageContentType.TXT);
+		message.setMessageDate(new Date());
 		mDatas.add(message);
+		message.save();
 		mChatAdapter.notifyDataSetChanged();
 		setListViewPos(mChatAdapter.getCount());
-		db.insert(message);// 加入数据库
+		Log.d("mikes", "add Txt: id="+message.getId());
 	}
 
 	/**
@@ -318,10 +316,12 @@ public class LiaoChatActivity extends Activity implements
 	private void addImg(int messageType, String img) {
 		ChatMessage imgMessage = new ChatMessage(messageType, img,
 				MessageContentType.IMG, 0);
+		imgMessage.setMessageDate(new Date());
+		imgMessage.save();
 		mDatas.add(imgMessage);
 		mChatAdapter.notifyDataSetChanged();
 		setListViewPos(mChatAdapter.getCount());
-		imgMessage.save();
+		Log.d("mikes", "add Img: id="+imgMessage.getId());
 	}
 
 	/**
@@ -332,13 +332,17 @@ public class LiaoChatActivity extends Activity implements
 			@Override
 			public void getDurationCallback(int duration) {
 				MediaManager.release();
-				Recorder recorder = new Recorder(duration, voice);
+				Recorder recorder = new Recorder(duration,voice);
+				recorder.save();
 				ChatMessage recordMessage = new ChatMessage(MessageType.FROM,
 						recorder, MessageContentType.VOICE);
+				recordMessage.setMessageDate(new Date());
+				recordMessage.save();
 				mDatas.add(recordMessage);
 				mChatAdapter.notifyDataSetChanged();
 				setListViewPos(mChatAdapter.getCount());
-				recordMessage.save();
+				Log.d("mikes", " push add Voice: message id="+recordMessage.getId()
+						+", record id="+recordMessage.getRecorder().getId());
 			}
 		});
 	}
@@ -393,11 +397,15 @@ public class LiaoChatActivity extends Activity implements
 										public void onClick(
 												DialogInterface arg0, int which) {
 											if (which == 0) {
-												mCameraPhotoPath = CameraUtils
+//												mCameraPhotoPath = CameraUtils
+//														.openCamera(
+//																LiaoChatActivity.this,
+//																PICK_CAMERA,
+//																AppContext.CAMERA_PATH);
+												CameraUtils
 														.openCamera(
 																LiaoChatActivity.this,
-																PICK_CAMERA,
-																AppContext.CAMERA_PATH);
+																PICK_CAMERA);
 												Log.d("mikes", "camera path="
 														+ mCameraPhotoPath);
 											} else if (which == 1) {
@@ -485,11 +493,12 @@ public class LiaoChatActivity extends Activity implements
 		if (messageType == MessageType.FROM) {
 			animView = view
 					.findViewById(R.id.id_chat_item_from_content_voice_anim);
+			animView.setBackgroundResource(R.drawable.recoder_from_play);
 		} else if (messageType == MessageType.TO) {
 			animView = view
 					.findViewById(R.id.id_chat_item_to_content_voice_anim);
+			animView.setBackgroundResource(R.drawable.recoder_to_play);
 		}
-		animView.setBackgroundResource(R.drawable.recoder_play);
 		final AnimationDrawable drawable = (AnimationDrawable) animView
 				.getBackground();
 		drawable.start();

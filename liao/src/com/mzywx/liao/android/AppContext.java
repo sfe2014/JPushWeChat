@@ -3,7 +3,6 @@ package com.mzywx.liao.android;
 import org.litepal.LitePalApplication;
 
 import cn.jpush.android.api.JPushInterface;
-import android.app.Application;
 import android.util.Log;
 
 public class AppContext extends LitePalApplication {

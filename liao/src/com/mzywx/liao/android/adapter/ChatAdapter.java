@@ -5,13 +5,12 @@ import java.util.List;
 
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.model.ChatMessage;
-import com.mzywx.liao.android.model.TimeModule;
 import com.mzywx.liao.android.model.ChatMessage.MessageContentType;
 import com.mzywx.liao.android.model.ChatMessage.MessageType;
+import com.mzywx.liao.android.utils.TimeUtil;
 import com.squareup.picasso.Picasso;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -144,7 +143,7 @@ public class ChatAdapter extends BaseAdapter {
             }
         }
 
-        holder.itemTime.setText(TimeModule.getTimeFormat());
+        holder.itemTime.setText(TimeUtil.formatToUtcDateTime(mDatas.get(position).getMessageDate()));
         holder.itemContentTxt.setMaxWidth(mMaxItemWidth);
         holder.itemContentImg.setMaxWidth(mMaxItemWidth);
 
@@ -164,7 +163,12 @@ public class ChatAdapter extends BaseAdapter {
             
             String imagePath = mDatas.get(position).getContentImage();
             if (!TextUtils.isEmpty(imagePath)) {
-                Picasso.with(mContext).load(new File(imagePath)).into(holder.itemContentImg);
+            	if (imagePath.startsWith("http")
+            			|| imagePath.startsWith("https")) {
+            		Picasso.with(mContext).load(imagePath).placeholder(R.drawable.ic_launcher).resize(400, 400).into(holder.itemContentImg);
+            	} else {
+            		Picasso.with(mContext).load(new File(imagePath)).placeholder(R.drawable.ic_launcher).resize(400, 400).into(holder.itemContentImg);
+            	}
             }
             break;
         case MessageContentType.VOICE:
