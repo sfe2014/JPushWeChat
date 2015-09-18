@@ -10,6 +10,8 @@
     
     <color name="color_transparent">#00000000</color><!-- 全透明黑色 -->
     <color name="color_btn_normal">#45C01A</color>
+    <color name="color_item_time">#ddd4d4d4</color>
+    <color name="color_record_label_cancel">#dd8b2a26</color>
     <color name="txt_ea">#EAEAEA</color>
     
     <!-- bottom -->

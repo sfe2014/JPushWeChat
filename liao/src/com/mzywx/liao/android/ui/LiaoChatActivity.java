@@ -3,28 +3,31 @@ package com.mzywx.liao.android.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.litepal.crud.DataSupport;
 import cn.jpush.android.api.JPushInterface;
 
+import com.mzywx.liao.android.AppContext;
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.adapter.ChatAdapter;
 import com.mzywx.liao.android.adapter.ChatAdapter.VoiceClickListener;
+import com.mzywx.liao.android.bean.ChatMessage;
+import com.mzywx.liao.android.bean.Recorder;
+import com.mzywx.liao.android.bean.ChatMessage.MessageContentType;
+import com.mzywx.liao.android.bean.ChatMessage.MessageState;
+import com.mzywx.liao.android.bean.ChatMessage.MessageType;
 import com.mzywx.liao.android.db.DbQueryHelper;
-import com.mzywx.liao.android.model.ChatMessage;
-import com.mzywx.liao.android.model.ChatMessage.MessageContentType;
-import com.mzywx.liao.android.model.ChatMessage.MessageType;
 import com.mzywx.liao.android.model.MediaManager;
 import com.mzywx.liao.android.model.MediaManager.GetDurationCallBack;
-import com.mzywx.liao.android.model.Recorder;
 import com.mzywx.liao.android.utils.AudioRecorderButton;
 import com.mzywx.liao.android.utils.AudioRecorderButton.AudioFinishRecorderListener;
 import com.mzywx.liao.android.utils.CameraUtils;
 import com.mzywx.liao.android.utils.CustomTopBarNew;
 import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
 import com.mzywx.liao.android.utils.ImageUtils;
+import com.mzywx.liao.android.utils.NetworkHelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,6 +53,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -59,7 +64,7 @@ import android.widget.Toast;
 
 public class LiaoChatActivity extends Activity implements
 		OnLayoutChangeListener, VoiceClickListener,
-		OnTopbarNewLeftLayoutListener {
+		OnTopbarNewLeftLayoutListener,OnItemLongClickListener {
 
 	private static final int PICK_IMAGE = 0x10;
 	private static final int PICK_CAMERA = 0x11;
@@ -67,6 +72,10 @@ public class LiaoChatActivity extends Activity implements
 	private static final int OPEN_FULLSCREEN = 0x13;
 
 	private static final int ICON_WIDTH_AND_HEIGHT = 200;
+	
+	private static final int LIMIT = 20;
+	private int offset = 0;
+	private static final int OFFSET_STEP = 3;
 
 	private String mCameraPhotoPath = "";//当前图片路径
 
@@ -106,6 +115,9 @@ public class LiaoChatActivity extends Activity implements
 	public static final String KEY_VOICE = "voice";// 自定义消息中的语音
 
 	private DbQueryHelper db = DbQueryHelper.getInstance();//打开数据库 若没有就创建
+	
+	View animView;
+	private int previouceMessageType = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +191,10 @@ public class LiaoChatActivity extends Activity implements
 						recorder.save();
 						ChatMessage recordMessage = new ChatMessage(MessageType.TO, recorder,
 								MessageContentType.VOICE);
+						recordMessage.setMessageDate(new Date());
+						if (!NetworkHelper.checkNetState(LiaoChatActivity.this)) {
+							recordMessage.setMessageState(MessageState.RUNNING);
+						}
 						recordMessage.save();
 						
 						mDatas.add(recordMessage);
@@ -201,14 +217,33 @@ public class LiaoChatActivity extends Activity implements
 		mChatListView.setAdapter(mChatAdapter);
 		mChatListView.setOnScrollListener(mListViewScrollListener);
 
-		List<ChatMessage> messagesList = DataSupport.findAll(ChatMessage.class);
+		List<ChatMessage> messagesList = db.queryChatMessage(LIMIT,offset);
 		for (ChatMessage chatMessage : messagesList) {
+			System.out.println(chatMessage.toString());
 			List<Recorder> recorders = chatMessage.getRecorders();
 			if (recorders.size() > 0) {
 				System.out.println(recorders.toString());
 				chatMessage.setRecorder(recorders.get(0));
 			}
 		}
+		Collections.reverse(messagesList);
+		mDatas.addAll(messagesList);
+		mChatAdapter.notifyDataSetChanged();
+		setListViewPos(mChatAdapter.getCount());
+	}
+	
+	private void loadMoreDatas(){
+		offset += OFFSET_STEP;
+		List<ChatMessage> messagesList = db.queryChatMessage(LIMIT,offset);
+		for (ChatMessage chatMessage : messagesList) {
+			System.out.println(chatMessage.toString());
+			List<Recorder> recorders = chatMessage.getRecorders();
+			if (recorders.size() > 0) {
+				System.out.println(recorders.toString());
+				chatMessage.setRecorder(recorders.get(0));
+			}
+		}
+		Collections.reverse(messagesList);
 		mDatas.addAll(messagesList);
 		mChatAdapter.notifyDataSetChanged();
 	}
@@ -246,7 +281,7 @@ public class LiaoChatActivity extends Activity implements
 				break;
 			case PICK_CAMERA:
 				Log.d("mikes",
-						"result data:" + data.getData().toString() + ",uri="
+						"result data:" + data.toString() + ",uri="
 								+ Uri.fromFile(new File(mCameraPhotoPath)));
 				// mBitmap = (Bitmap) data.getExtras().get("data");
 				break;
@@ -258,19 +293,6 @@ public class LiaoChatActivity extends Activity implements
 				Log.d("mikes",
 						"path=" + mCameraPhotoPath + ",uri="
 								+ Uri.fromFile(new File(mCameraPhotoPath)));
-				// if (path != null
-				// && (path.endsWith(".jpg") || path.endsWith(".png")
-				// || path.endsWith(".PNG") || path
-				// .endsWith(".JPG"))) {
-				// BitmapFactory.Options option = new BitmapFactory.Options();
-				// option.inJustDecodeBounds = true;
-				// BitmapFactory.decodeFile(path, option);
-				// option.inSampleSize = ImageUtils.calculateInSampleSize(
-				// option, ICON_WIDTH_AND_HEIGHT,
-				// ICON_WIDTH_AND_HEIGHT);
-				// option.inJustDecodeBounds = false;
-				// mBitmap = BitmapFactory.decodeFile(path, option);
-				// }
 				break;
 			default:
 				break;
@@ -303,8 +325,11 @@ public class LiaoChatActivity extends Activity implements
 		ChatMessage message = new ChatMessage(messageType, content,
 				MessageContentType.TXT);
 		message.setMessageDate(new Date());
-		mDatas.add(message);
+		if (!NetworkHelper.checkNetState(this)) {
+			message.setMessageState(MessageState.RUNNING);
+		}
 		message.save();
+		mDatas.add(message);
 		mChatAdapter.notifyDataSetChanged();
 		setListViewPos(mChatAdapter.getCount());
 		Log.d("mikes", "add Txt: id="+message.getId());
@@ -317,6 +342,9 @@ public class LiaoChatActivity extends Activity implements
 		ChatMessage imgMessage = new ChatMessage(messageType, img,
 				MessageContentType.IMG, 0);
 		imgMessage.setMessageDate(new Date());
+		if (!NetworkHelper.checkNetState(this)) {
+			imgMessage.setMessageState(MessageState.RUNNING);
+		}
 		imgMessage.save();
 		mDatas.add(imgMessage);
 		mChatAdapter.notifyDataSetChanged();
@@ -336,6 +364,9 @@ public class LiaoChatActivity extends Activity implements
 				recorder.save();
 				ChatMessage recordMessage = new ChatMessage(MessageType.FROM,
 						recorder, MessageContentType.VOICE);
+				if (!NetworkHelper.checkNetState(LiaoChatActivity.this)) {
+					recordMessage.setMessageState(MessageState.RUNNING);
+				}
 				recordMessage.setMessageDate(new Date());
 				recordMessage.save();
 				mDatas.add(recordMessage);
@@ -397,15 +428,11 @@ public class LiaoChatActivity extends Activity implements
 										public void onClick(
 												DialogInterface arg0, int which) {
 											if (which == 0) {
-//												mCameraPhotoPath = CameraUtils
-//														.openCamera(
-//																LiaoChatActivity.this,
-//																PICK_CAMERA,
-//																AppContext.CAMERA_PATH);
-												CameraUtils
+												mCameraPhotoPath = CameraUtils
 														.openCamera(
 																LiaoChatActivity.this,
-																PICK_CAMERA);
+																PICK_CAMERA,
+																AppContext.CAMERA_PATH);
 												Log.d("mikes", "camera path="
 														+ mCameraPhotoPath);
 											} else if (which == 1) {
@@ -446,6 +473,10 @@ public class LiaoChatActivity extends Activity implements
 			switch (scrollState) {
 			case OnScrollListener.SCROLL_STATE_IDLE:// 当不滚动时
 				scrollFlag = false;
+                // 滚动到顶部
+                if (mChatListView.getFirstVisiblePosition() == 0) {
+                	loadMoreDatas();
+                }
 				break;
 			case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:// 滚动时
 				scrollFlag = true;
@@ -474,9 +505,6 @@ public class LiaoChatActivity extends Activity implements
 				&& (bottom - oldBottom > keyHeight)) {// 软键盘关闭
 		}
 	}
-
-	View animView;
-	private int previouceMessageType = -1;
 
 	@Override
 	public void onVoiceClick(View view, int position) {
@@ -532,6 +560,27 @@ public class LiaoChatActivity extends Activity implements
 				animView.setBackgroundResource(R.drawable.ic_chat_voice_to);
 			}
 		}
+	}
+	
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position,
+			long arg3) {
+		int messageContentType = mDatas.get(position).getContentType();
+		switch (messageContentType) {
+		case MessageContentType.TXT:
+			
+			break;
+		case MessageContentType.IMG:
+			
+			break;
+		case MessageContentType.VOICE:
+			
+			break;
+		default:
+			break;
+		}
+		return false;
 	}
 
 	public class MessageReceiver extends BroadcastReceiver {

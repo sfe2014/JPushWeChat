@@ -2,6 +2,7 @@ package com.mzywx.liao.android.utils;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -13,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,6 +26,7 @@ public class RecoderDialog extends android.app.Dialog {
 	private ImageView mIcon;
 	private ImageView mVoice;
 	private TextView mLable;
+	private ProgressBar mProgressBar;
 	private View view;
 	private View backView;
 
@@ -72,6 +75,8 @@ public class RecoderDialog extends android.app.Dialog {
 		mIcon = (ImageView) findViewById(R.id.id_recorder_dialog_icon);
 		mVoice = (ImageView) findViewById(R.id.id_recorder_dialog_voice);
 		mLable = (TextView) findViewById(R.id.id_recorder_dialog_label);
+		mProgressBar = (ProgressBar) findViewById(R.id.id_recorder_dialog_progress);
+		mProgressBar.incrementProgressBy(-1);
 	}
 
 	@Override
@@ -107,7 +112,16 @@ public class RecoderDialog extends android.app.Dialog {
 	}
 
 	public void setLabelText(int resId) {
-		mLable.setText(context.getString(R.string.voice_recording));
+		mLable.setText(resId);
+	}
+	
+	public void setLabelTextBackground(int resId) {
+		mLable.setBackgroundResource(resId);
+	}
+	
+	public void setProgress(int value) {
+		Log.d("lyl", "value"+value);
+		mProgressBar.setProgress(value);
 	}
 
 	@Override

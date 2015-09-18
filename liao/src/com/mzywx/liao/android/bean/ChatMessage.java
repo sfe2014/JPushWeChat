@@ -1,4 +1,4 @@
-package com.mzywx.liao.android.model;
+package com.mzywx.liao.android.bean;
 
 import java.util.Date;
 import java.util.List;
@@ -10,6 +10,12 @@ public class ChatMessage extends DataSupport {
 	public class MessageType {
 		public static final int FROM = 0;// 收到消息
 		public static final int TO = 1;// 发出消息
+	}
+
+	public class MessageState {
+		public static final int SUCCESS = 0;// 成功
+		public static final int RUNNING = 1;// 发送中
+		public static final int FAILURE = 2;// 失败
 	}
 
 	public class MessageContentType {
@@ -36,6 +42,8 @@ public class ChatMessage extends DataSupport {
 	private String contentImage;// 图片地址
 
 	private Date messageDate;// 消息时间
+
+	private int messageState = MessageState.SUCCESS;// 消息状态
 
 	private Recorder recorder;
 
@@ -151,12 +159,21 @@ public class ChatMessage extends DataSupport {
 		this.messageDate = messageDate;
 	}
 
+	public int getMessageState() {
+		return messageState;
+	}
+
+	public void setMessageState(int messageState) {
+		this.messageState = messageState;
+	}
+
 	@Override
 	public String toString() {
 		return "ChatMessage [id=" + id + ", messageType=" + messageType
 				+ ", contentType=" + contentType + ", contentText="
 				+ contentText + ", contentImage=" + contentImage
-				+ ", recorder=" + recorder + "]";
+				+ ", messageDate=" + messageDate + ", messageState="
+				+ messageState + ", recorder=" + recorder + "]";
 	}
 
 }

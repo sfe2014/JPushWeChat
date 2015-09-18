@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class TimeUtil {
-    final static DateFormat simpleFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final static DateFormat simpleFormatter = new SimpleDateFormat("MM-dd HH:mm");
 
     public static long getLocalServerTimeDiff() {
         return localServerTimeDiff;

@@ -6,6 +6,9 @@
     <dimen name="text_big">16.0dp</dimen>
     <!-- topbar -->
     <dimen name="text_medium">16.0dp</dimen>
+    
+    <!-- time text -->
+	<dimen name="text_time">12.0sp</dimen>
 
     <!-- bars -->
     <dimen name="topbar_height">50.0dp</dimen>

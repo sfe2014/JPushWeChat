@@ -5,12 +5,10 @@
 
     <TextView
         android:id="@+id/id_chat_item_from_time"
+        style="@style/Theme_TimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:textColor="@color/color_text_gray"
-        android:textSize="12sp"
         android:visibility="visible" />
 
     <RelativeLayout
@@ -30,6 +28,7 @@
             android:src="@drawable/ic_chat_from_usericon" />
 
         <RelativeLayout
+            android:id="@+id/chatfromcantainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -69,7 +68,7 @@
                 android:id="@+id/id_chat_item_from_content_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
+                android:padding="8dp"
                 android:background="@drawable/ic_chat_from_background"
                 android:scaleType="centerInside"
                 android:visibility="gone" />
@@ -81,11 +80,19 @@
                 android:layout_below="@id/id_chat_item_from_content_img"
                 android:background="@drawable/ic_chat_from_background"
                 android:gravity="center"
-                android:paddingLeft="8dp"
-                android:paddingRight="3dp"
-                android:textIsSelectable="false" >
+                android:padding="5dp" >
             </TextView>
         </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/id_chat_item_from_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/chatfromcantainer"
+            android:scaleType="centerInside"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -5,12 +5,10 @@
 
     <TextView
         android:id="@+id/id_chat_item_to_time"
+        style="@style/Theme_TimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:textColor="@color/color_text_gray"
-        android:textSize="12sp"
         android:visibility="visible" />
 
     <RelativeLayout
@@ -30,17 +28,18 @@
             android:src="@drawable/ic_chat_to_usericon" />
 
         <RelativeLayout
+            android:id="@+id/chattocantainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/id_chat_item_to_user_icon"
             android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/id_chat_item_to_user_icon"
             android:gravity="center_vertical" >
 
             <RelativeLayout
                 android:id="@+id/id_chat_item_to_content_voice_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
+                android:padding="5dp"
                 android:background="@drawable/ic_chat_to_background"
                 android:gravity="center_vertical"
                 android:visibility="gone" >
@@ -69,7 +68,7 @@
                 android:id="@+id/id_chat_item_to_content_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
+                android:padding="8dp"
                 android:background="@drawable/ic_chat_to_background"
                 android:scaleType="centerInside"
                 android:visibility="gone" />
@@ -81,11 +80,19 @@
                 android:layout_below="@id/id_chat_item_to_content_img"
                 android:background="@drawable/ic_chat_to_background"
                 android:gravity="center"
-                android:paddingLeft="3dp"
-                android:paddingRight="8dp"
-                android:textIsSelectable="false" >
+                android:padding="5dp" >
             </TextView>
         </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/id_chat_item_to_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:layout_toLeftOf="@id/chattocantainer"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </RelativeLayout>

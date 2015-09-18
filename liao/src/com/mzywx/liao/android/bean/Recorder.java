@@ -1,4 +1,4 @@
-package com.mzywx.liao.android.model;
+package com.mzywx.liao.android.bean;
 
 import org.litepal.crud.DataSupport;
 
