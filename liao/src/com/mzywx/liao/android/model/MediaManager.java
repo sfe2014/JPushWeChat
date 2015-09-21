@@ -2,6 +2,9 @@ package com.mzywx.liao.android.model;
 
 import java.io.IOException;
 
+import com.mzywx.liao.android.AppContext;
+
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -23,7 +26,6 @@ public class MediaManager {
 		if (mediaPlayer == null) {
 			mediaPlayer = new MediaPlayer();
 			mediaPlayer.setOnErrorListener(new OnErrorListener() {
-
 				@Override
 				public boolean onError(MediaPlayer mp, int what, int extra) {
 					mediaPlayer.reset();
@@ -34,7 +36,12 @@ public class MediaManager {
 			mediaPlayer.stop();
 			mediaPlayer.reset();
 		}
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		if (AppContext.isSpeakerOn){
+		    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);// speaker
+		} else {
+		    mediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);//headset
+		}
+		
 		mediaPlayer.setOnCompletionListener(onCompletionListener);
 		mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 			@Override
@@ -46,6 +53,13 @@ public class MediaManager {
 		Log.d("mikes", "play sound:path=" + filePath);
 		mediaPlayer.setDataSource(filePath);
 		mediaPlayer.prepareAsync();
+	}
+	
+	public static void stopSound() {
+		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+			mediaPlayer.stop();
+			mediaPlayer.reset();
+		}
 	}
 
 	public static void getMediaDuration(String voice,

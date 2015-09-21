@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:background="@drawable/dialog_loading_bg"
+        android:alpha="0.6"
         android:padding="24dp" >
 
         <LinearLayout

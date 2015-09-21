@@ -25,6 +25,7 @@ public class CustomTopBarNew extends RelativeLayout {
     private ImageButton rightButton = null;
     private TextView rightTextView = null;
     private TextView topTitleTextView = null;
+    private ImageView modeImageView = null;
 
     public CustomTopBarNew(Context context) {
         super(context);
@@ -54,6 +55,14 @@ public class CustomTopBarNew extends RelativeLayout {
 
         topTitleTextView = (TextView) findViewById(R.id.id_topbarTitle);
         topTitleTextView.setOnClickListener(new MyViewOnClickListener());
+        
+        modeImageView = (ImageView) findViewById(R.id.id_topbarModeImageView);
+    }
+    
+    public void setTopbarModeResource(int drawable) {
+        if (modeImageView != null) {
+            modeImageView.setImageResource(drawable);
+        }
     }
 
     public void setTopbarBackground(int drawable) {

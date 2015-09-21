@@ -63,7 +63,6 @@ public class AudioManager {
             File file = new File(dir, fileName);
 
             mCurrentFilePath = file.getAbsolutePath();
-            Log.d("mikes", "mCurrentFilePath=" + mCurrentFilePath);
 
             mMediaRecorder = new MediaRecorder();
             // 设置输出文件
@@ -118,6 +117,7 @@ public class AudioManager {
 //        mMediaRecorder.stop();
 //        mMediaRecorder.release();
     	if (mMediaRecorder != null) {
+    		Log.d("mikes", "Media Player reset ---->");
     		mMediaRecorder.reset();
     		mMediaRecorder = null;
     	}

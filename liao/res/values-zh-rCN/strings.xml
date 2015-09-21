@@ -19,4 +19,20 @@
     <string name="voice_record_too_short">录音时间过短</string>
     <string name="image_fullscreen_title">图片</string>
 
+    <string-array name="menu_txt">
+        <item>复制</item>
+        <item>删除</item>
+    </string-array>
+    <string-array name="menu_voice">
+        <item>使用听筒模式</item>
+        <item>使用扬声器模式</item>
+        <item>删除</item>
+    </string-array>
+    <string-array name="menu_img">
+        <item>删除</item>
+    </string-array>
+
+    <string name="str_copy_already">已复制</string>
+    <string name="str_audio_notfound">抱歉,未找到语音文件</string>
+
 </resources>

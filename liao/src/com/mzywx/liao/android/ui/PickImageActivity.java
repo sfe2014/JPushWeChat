@@ -16,13 +16,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
-public class ImageFullScreenActivity extends Activity implements OnTopbarNewLeftLayoutListener,OnTopbarNewRightButtonListener{
+public class PickImageActivity extends Activity implements OnTopbarNewLeftLayoutListener,OnTopbarNewRightButtonListener{
     private ImageView mImageView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.chat_image_fullscreen_layout);
+        setContentView(R.layout.chat_pick_image_layout);
         init();
     }
     

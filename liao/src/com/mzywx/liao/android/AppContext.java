@@ -9,6 +9,7 @@ public class AppContext extends LitePalApplication {
 	private static final String TAG = "JPush";
 	public static final String VOICE_PATH = "/storage/sdcard0/liao_chat/voice";
 	public static final String CAMERA_PATH = "/storage/sdcard0/liao_chat/camera";
+	public static boolean isSpeakerOn = true;//测试使用
 
 	@Override
 	public void onCreate() {

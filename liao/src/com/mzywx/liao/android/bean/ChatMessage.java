@@ -146,7 +146,7 @@ public class ChatMessage extends DataSupport {
 		this.recorder = recorder;
 	}
 
-	public List<Recorder> getRecorders() {
+	public List<Recorder> getRecorders() {//lazy loading recorder datas by id
 		return DataSupport.where("chatmessage_id = ?", String.valueOf(id))
 				.find(Recorder.class);
 	}

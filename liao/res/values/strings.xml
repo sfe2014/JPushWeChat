@@ -14,9 +14,24 @@
 
     <string name="voice_button_pressed_up">Release to Send</string>
     <string name="voice_button_pressed_down">Hold to Talk</string>
-    <string name="voice_recording">手指上滑，取消发送</string>
-    <string name="voice_record_cancel">松开手指，取消发送</string>
-    <string name="voice_record_too_short">录音时间过短</string>
+    <string name="voice_recording">Fingers slip, cancel sending</string>
+    <string name="voice_record_cancel">Release your finger to cancel sending</string>
+    <string name="voice_record_too_short">Recording time is too short</string>
     <string name="image_fullscreen_title">Gallery</string>
+
+    <string-array name="menu_txt">
+        <item>Copy</item>
+        <item>Delete</item>
+    </string-array>
+    <string-array name="menu_voice">
+        <item>Using the handset mode</item>
+        <item>Delete</item>
+    </string-array>
+    <string-array name="menu_img">
+        <item>Delete</item>
+    </string-array>
+
+    <string name="str_copy_already">Copyed</string>
+    <string name="str_audio_notfound">Sorry, cannot find audio file</string>
 
 </resources>

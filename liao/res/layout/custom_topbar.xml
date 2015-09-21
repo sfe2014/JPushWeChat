@@ -4,7 +4,7 @@
     android:id="@+id/mainItemLayout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/topbar_height"
-    android:background="@color/toolbarcolor">
+    android:background="@color/toolbarcolor" >
 
     <LinearLayout
         android:id="@+id/id_topbarLeftLinearLayout"
@@ -12,25 +12,26 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:background="@drawable/back_layout_selector"
-        android:paddingLeft="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        tools:ignore="UseCompoundDrawables">
+        android:paddingLeft="16dp"
+        tools:ignore="UseCompoundDrawables" >
 
         <ImageView
             android:id="@+id/id_topbarLeftBackImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="ContentDescription"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:src="@drawable/ic_app_back"
-            android:background="@null" />
-        
-        <View android:layout_width="1dp"
+            tools:ignore="ContentDescription"
+            android:scaleType="centerInside" />
+
+        <View
+            android:layout_width="1dp"
             android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@color/color_black"/>
+            android:background="@color/color_black" />
 
         <TextView
             android:id="@+id/id_topbarLeftBackTitle"
@@ -42,23 +43,33 @@
             android:paddingLeft="10dp"
             android:singleLine="true"
             android:textColor="@color/color_white"
-            android:visibility="gone"
-            android:textSize="@dimen/text_big" />
+            android:textSize="@dimen/text_big"
+            android:visibility="gone" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/id_topbarTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/id_topbarLeftLinearLayout"
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@id/id_topbarLeftLinearLayout"
         android:ellipsize="end"
         android:lines="1"
         android:maxLength="10"
         android:singleLine="true"
         android:textColor="@color/color_white"
         android:textSize="@dimen/text_big_big" />
+
+    <ImageView
+        android:id="@+id/id_topbarModeImageView"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/id_topbarTitle"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:scaleType="centerInside"
+        tools:ignore="ContentDescription" />
 
     <ImageButton
         android:id="@+id/id_topbarRightImageButton"

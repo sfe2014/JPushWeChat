@@ -72,7 +72,7 @@ public class AudioRecorderButton extends Button {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_AUDIO_PREPARED:
-				Log.d("mikes", "audio prepared");
+				Log.d("mikes", "audio prepared already");
 				// 显示对话框在开始录音以后
 				mDialogManager.showRecordingDialog();
 				isRecording = true;

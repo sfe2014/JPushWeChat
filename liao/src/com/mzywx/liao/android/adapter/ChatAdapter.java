@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -152,9 +153,11 @@ public class ChatAdapter extends BaseAdapter {
 		holder.itemTime.setText(TimeUtil.formatToUtcDateTime(mDatas.get(
 				position).getMessageDate()));
 		holder.itemContentTxt.setMaxWidth(mMaxItemWidth);
-		holder.itemContentImg.setMaxWidth(mMaxItemWidth);
-		
+		holder.itemState.setImageResource(0);
+
 		int messageState = mDatas.get(position).getMessageState();
+		Log.d("mikes", "messageState:" + messageState + ", position="
+				+ position);
 		switch (messageState) {
 		case MessageState.RUNNING:
 			holder.itemState.setVisibility(View.VISIBLE);
@@ -166,6 +169,7 @@ public class ChatAdapter extends BaseAdapter {
 			holder.itemState.setImageResource(R.drawable.ic_chat_state_failure);
 			break;
 		case MessageState.SUCCESS:
+			holder.itemState.setVisibility(View.GONE);
 		default:
 			break;
 		}
@@ -174,8 +178,8 @@ public class ChatAdapter extends BaseAdapter {
 		switch (contentType) {
 		case MessageContentType.TXT:
 			holder.itemVoiceView.setVisibility(View.GONE);
-			holder.itemContentImg.setVisibility(View.GONE);
 			holder.itemContentTxt.setVisibility(View.VISIBLE);
+			holder.itemContentImg.setVisibility(View.GONE);
 
 			holder.itemContentTxt
 					.setText(mDatas.get(position).getContentText());
@@ -191,11 +195,11 @@ public class ChatAdapter extends BaseAdapter {
 						|| imagePath.startsWith("https")) {
 					Picasso.with(mContext).load(imagePath)
 							.placeholder(R.drawable.ic_launcher)
-							.resize(400, 400).into(holder.itemContentImg);
+							.resize(300, 400).into(holder.itemContentImg);
 				} else {
 					Picasso.with(mContext).load(new File(imagePath))
 							.placeholder(R.drawable.ic_launcher)
-							.resize(400, 400).into(holder.itemContentImg);
+							.resize(300, 400).into(holder.itemContentImg);
 				}
 			}
 			break;
@@ -212,16 +216,18 @@ public class ChatAdapter extends BaseAdapter {
 					* mDatas.get(position).getRecorder().getSeconds());
 			holder.itemVoiceView.setLayoutParams(lp1);
 
-			holder.itemVoiceView.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					mListener.onVoiceClick(view, position);
-				}
-			});
+//			holder.itemVoiceView.setOnClickListener(new OnClickListener() {
+//				@Override
+//				public void onClick(View view) {
+//					mListener.onVoiceClick(view, position);
+//				}
+//			});
 			break;
 		default:
 			break;
 		}
+		
+		
 
 		return convertView;
 	}

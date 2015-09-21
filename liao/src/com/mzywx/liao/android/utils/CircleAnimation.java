@@ -17,7 +17,9 @@ public class CircleAnimation {
 	}
 
 	public static void stopRotateAnmiation(View animatedView) {
-		animatedView.getAnimation().cancel();
-		animatedView.setVisibility(View.GONE);
+		if (animatedView.getAnimation() != null) {
+			animatedView.getAnimation().cancel();
+			animatedView.setVisibility(View.GONE);
+		}
 	}
 }
