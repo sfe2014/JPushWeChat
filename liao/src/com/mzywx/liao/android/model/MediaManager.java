@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.mzywx.liao.android.AppContext;
 
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;

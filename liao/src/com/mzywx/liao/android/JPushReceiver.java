@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import com.mzywx.liao.android.ui.LiaoChatActivity;
 import com.mzywx.liao.android.utils.JPushUtil;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

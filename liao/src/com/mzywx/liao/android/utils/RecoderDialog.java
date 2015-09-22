@@ -2,6 +2,7 @@ package com.mzywx.liao.android.utils;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -50,11 +51,11 @@ public class RecoderDialog extends android.app.Dialog {
 		/*
 		 * 将对话框的大小按屏幕大小的百分比设置
 		 */
-		WindowManager m = dialogWindow.getWindowManager();
-		Display d = m.getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        dialogWindow.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		WindowManager.LayoutParams p = dialogWindow.getAttributes();
-		p.height = (int) (d.getHeight() * 0.8);
-		p.width = (int) (d.getWidth() * 0.8);
+		p.height = (int) (dm.heightPixels * 0.8);
+		p.width = (int) (dm.widthPixels * 0.8);
 		dialogWindow.setAttributes(p);
 
 		view = (RelativeLayout) findViewById(R.id.id_recoder_contentview);

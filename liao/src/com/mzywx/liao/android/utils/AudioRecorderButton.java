@@ -1,7 +1,6 @@
 package com.mzywx.liao.android.utils;
 
 import android.content.Context;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;

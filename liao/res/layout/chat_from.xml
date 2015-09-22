@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
 
     <TextView
         android:id="@+id/id_chat_item_from_time"
@@ -26,7 +27,8 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_chat_from_usericon" />
+            android:src="@drawable/ic_chat_from_usericon"
+            tools:ignore="contentDescription" />
 
         <RelativeLayout
             android:id="@+id/chatfromcantainer"
@@ -69,10 +71,11 @@
                 android:id="@+id/id_chat_item_from_content_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
                 android:background="@drawable/ic_chat_from_background"
+                android:padding="8dp"
                 android:scaleType="centerInside"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:ignore="contentDescription" />
 
             <TextView
                 android:id="@+id/id_chat_item_from_content_txt"
@@ -93,7 +96,8 @@
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/chatfromcantainer"
             android:scaleType="centerInside"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="contentDescription" />
     </RelativeLayout>
 
 </RelativeLayout>

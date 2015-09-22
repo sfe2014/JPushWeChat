@@ -10,12 +10,14 @@ import com.squareup.picasso.Picasso;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+/**
+ * 本地发送图片全屏查看
+ *
+ */
 public class PickImageActivity extends Activity implements OnTopbarNewLeftLayoutListener,OnTopbarNewRightButtonListener{
     private ImageView mImageView;
     

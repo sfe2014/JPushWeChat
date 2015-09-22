@@ -29,7 +29,7 @@
                 android:layout_width="128dp"
                 android:layout_height="wrap_content"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_chat_recoder" />
+                android:src="@drawable/ic_chat_recoder_recording" />
 
             <ImageView
                 android:id="@+id/id_recorder_dialog_voice"

@@ -1,7 +1,6 @@
 package com.mzywx.liao.android.ui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,23 +32,20 @@ import com.mzywx.liao.android.utils.MenuDialog;
 import com.mzywx.liao.android.utils.NetworkHelper;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View.OnClickListener;
 import android.view.View.OnLayoutChangeListener;
@@ -59,7 +55,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,16 +63,17 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+/**
+ * 聊天界面
+ * 
+ */
 public class LiaoChatActivity extends Activity implements
         OnLayoutChangeListener, VoiceClickListener,
-        OnTopbarNewLeftLayoutListener, OnItemLongClickListener,
-        OnItemClickListener {
+        OnTopbarNewLeftLayoutListener {
 
     private static final int PICK_CAMERA = 0x11;
     private static final int PICK_PICTURE = 0x12;
     private static final int OPEN_FULLSCREEN = 0x13;
-
-    private static final int ICON_WIDTH_AND_HEIGHT = 200;
 
     private static final int LIMIT = 10;
     private int offset = 0;
@@ -88,8 +84,10 @@ public class LiaoChatActivity extends Activity implements
     private View mRootView;
     private View mBottomView;
 
-    // 屏幕高度
-    private int screenHeight = 0;
+    private View mMoreView;
+    private ImageView mAddPicture;
+    private ImageView mAddCamera;
+
     // 软件盘弹起后所占高度阀值
     private int keyHeight = 0;
 
@@ -108,7 +106,6 @@ public class LiaoChatActivity extends Activity implements
     private int mContentType = MessageContentType.DEFAULT;
     // listview
     private boolean scrollFlag = false;// 标记是否滑动
-    private Bitmap mBitmap;
     public static boolean isForeground = false;
 
     // for receive customer msg from jpush server
@@ -121,7 +118,7 @@ public class LiaoChatActivity extends Activity implements
     public static final String KEY_VOICE = "voice";// 自定义消息中的语音
 
     private DbQueryHelper db = DbQueryHelper.getInstance();// open database
-    
+
     CustomTopBarNew topbar;
 
     View animView;
@@ -179,15 +176,19 @@ public class LiaoChatActivity extends Activity implements
         initTopBar();
 
         mRootView = findViewById(R.id.id_chat_main_rootview);
-        // 获取屏幕高度
-        screenHeight = this.getWindowManager().getDefaultDisplay().getHeight();
+        DisplayMetrics dm = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
         // 阀值设置为屏幕高度的1/3
-        keyHeight = screenHeight / 3;
+        keyHeight = dm.heightPixels / 3;
+
+        mMoreView = findViewById(R.id.id_chat_morewindow);
+        mAddPicture = (ImageView) findViewById(R.id.id_chat_addpicture);
+        mAddCamera = (ImageView) findViewById(R.id.id_chat_addcamera);
+        mAddPicture.setOnClickListener(mOnClickListener);
+        mAddCamera.setOnClickListener(mOnClickListener);
 
         mBottomView = findViewById(R.id.id_chat_main_btn_bottom);
         mChatListView = (ListView) findViewById(R.id.id_chat_main_list);
-        mChatListView.setOnItemClickListener(this);
-        mChatListView.setOnItemLongClickListener(this);
 
         mContentEdit = (EditText) findViewById(R.id.id_chat_main_edit);
         mContentEdit.addTextChangedListener(new ContentWatcher());
@@ -284,10 +285,6 @@ public class LiaoChatActivity extends Activity implements
                 Log.d("mikes", "result data:" + data.toString());
                 mCameraPhotoPath = CameraUtils.getPhotoPathByLocalUri(this,
                         data);
-
-                Log.d("mikes",
-                        "path=" + mCameraPhotoPath + ",uri="
-                                + Uri.fromFile(new File(mCameraPhotoPath)));
                 break;
             default:
                 break;
@@ -375,23 +372,6 @@ public class LiaoChatActivity extends Activity implements
         });
     }
 
-    /**
-     * 滚动ListView到指定位置
-     * 
-     * @param pos
-     */
-    private void setListViewPos(int pos) {
-        mChatListView.setSelection(pos);
-    }
-
-    private void hideImm() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        boolean isShown = imm.isActive();
-        if (isShown) {
-            imm.hideSoftInputFromWindow(mContentEdit.getWindowToken(), 0);
-        }
-    }
-
     private OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -403,34 +383,24 @@ public class LiaoChatActivity extends Activity implements
                 mContentEdit.setText("");
                 break;
             case R.id.id_chat_main_add:
-                if (mVoiceButton.getVisibility() == View.VISIBLE) {
-                    mVoiceButton.setVisibility(View.GONE);
-                    mBottomView.setVisibility(View.VISIBLE);
+                if (mMoreView.getVisibility() == View.GONE) {
+                    mMoreView.setVisibility(View.VISIBLE);
+                    hideImm();
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            LiaoChatActivity.this);
-                    builder.setTitle(R.string.modify_icon_dialog_title)
-                            .setItems(R.array.modify_icon_dialog_choices,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface arg0, int which) {
-                                            if (which == 0) {
-                                                mCameraPhotoPath = CameraUtils
-                                                        .openCamera(
-                                                                LiaoChatActivity.this,
-                                                                PICK_CAMERA,
-                                                                AppContext.CAMERA_PATH);
-                                                Log.d("mikes", "camera path="
-                                                        + mCameraPhotoPath);
-                                            } else if (which == 1) {
-                                                CameraUtils.openPhotos(
-                                                        LiaoChatActivity.this,
-                                                        PICK_PICTURE);
-                                            }
-                                        }
-                                    }).create().show();
+                    showImm();
+                    mMoreView.setVisibility(View.GONE);
                 }
+                break;
+            case R.id.id_chat_addcamera:
+                mCameraPhotoPath = CameraUtils.openCamera(
+                        LiaoChatActivity.this, PICK_CAMERA,
+                        AppContext.CAMERA_PATH);
+                Log.d("mikes", "open camera:" + mCameraPhotoPath);
+                mMoreView.setVisibility(View.GONE);
+                break;
+            case R.id.id_chat_addpicture:
+                CameraUtils.openPhotos(LiaoChatActivity.this, PICK_PICTURE);
+                mMoreView.setVisibility(View.GONE);
                 break;
             case R.id.id_chat_main_voice:
                 mContentType = MessageContentType.VOICE;
@@ -445,6 +415,7 @@ public class LiaoChatActivity extends Activity implements
                             .setImageResource(R.drawable.ic_chat_voice_button);
                     mVoiceButton.setVisibility(View.GONE);
                     mBottomView.setVisibility(View.VISIBLE);
+                    showImm();
                 }
                 break;
             default:
@@ -452,6 +423,33 @@ public class LiaoChatActivity extends Activity implements
             }
         }
     };
+    
+    /**
+     * 滚动ListView到指定位置
+     * 
+     * @param pos
+     */
+    private void setListViewPos(int pos) {
+        // if (android.os.Build.VERSION.SDK_INT >= 8) {
+        // mChatListView.smoothScrollToPosition(pos);
+        // } else {
+        mChatListView.setSelection(pos);
+        // }
+    }
+
+    private void hideImm() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        boolean isShown = imm.isActive();
+        if (isShown) {
+            imm.hideSoftInputFromWindow(mContentEdit.getWindowToken(), 0);
+        }
+    }
+
+    private void showImm() {
+        mContentEdit.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mContentEdit, InputMethodManager.SHOW_FORCED);
+    }
 
     private OnScrollListener mListViewScrollListener = new OnScrollListener() {
 
@@ -478,6 +476,9 @@ public class LiaoChatActivity extends Activity implements
         public void onScroll(AbsListView arg0, int firstVisibleItem,
                 int visibleItemCount, int totalItemCount) {
             if (scrollFlag) {
+                if (mMoreView.isShown()) {
+                    mMoreView.setVisibility(View.GONE);
+                }
                 hideImm();
             }
         }
@@ -486,12 +487,16 @@ public class LiaoChatActivity extends Activity implements
     @Override
     public void onLayoutChange(View v, int left, int top, int right,
             int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        if (oldBottom != 0 && bottom != 0 && (oldBottom - bottom > keyHeight)) {// soft
-                                                                                // keyboard
-                                                                                // opened
+        if (oldBottom != 0 && bottom != 0 && (oldBottom - bottom > keyHeight)) {
+            Log.d("mikes", "keyboard open");
+            // soft keyboard opened
+            if (mMoreView.getVisibility() == View.VISIBLE) {
+                mMoreView.setVisibility(View.GONE);
+            }
             setListViewPos(mChatAdapter.getCount());
         } else if (oldBottom != 0 && bottom != 0
                 && (bottom - oldBottom > keyHeight)) {// soft keyboard closed
+            Log.d("mikes", "keyboard close");
         }
     }
 
@@ -504,14 +509,19 @@ public class LiaoChatActivity extends Activity implements
                 // stop last item animation
                 stopVoiceItemAnim(previouceMessageType);
                 animView = null;
-            }
-            if (previousPosition == position) {
-                // user click the same voice item, so stop it.
-                stopVoiceItemAnim(messageType);
-                MediaManager.stopSound();
-                animView = null;
-                previousPosition = -1;
-                return;
+            } else {
+                if (previousPosition == position) {
+                    // user click the same voice item, so stop it.
+                    stopVoiceItemAnim(messageType);
+                    MediaManager.stopSound();
+                    animView = null;
+                    previousPosition = -1;
+                    return;
+                } else {
+                    stopVoiceItemAnim(previouceMessageType);
+                    animView = null;
+                    MediaManager.stopSound();
+                }
             }
         }
         previousPosition = position;
@@ -543,7 +553,8 @@ public class LiaoChatActivity extends Activity implements
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Sorry,未找到语音文件", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_audio_notfound),
+                    Toast.LENGTH_SHORT).show();
             // when occurs exception, audio player stop automatically.
             stopVoiceItemAnim(messageType);
         }
@@ -561,70 +572,94 @@ public class LiaoChatActivity extends Activity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View view, int position,
-            long arg3) {
-        int contentType = mDatas.get(position).getContentType();
-        if (contentType == MessageContentType.VOICE) {
-            final int messageType = mDatas.get(position).getMessageType();
-            String filePath = mDatas.get(position).getRecorder().getFilePath();
-            if (animView != null) {
-                if (previouceMessageType != messageType) {
-                    // stop last item animation
-                    stopVoiceItemAnim(previouceMessageType);
-                    animView = null;
-                } else {
-                    if (previousPosition == position) {
-                        // user click the same voice item, so stop it.
-                        stopVoiceItemAnim(messageType);
-                        MediaManager.stopSound();
-                        animView = null;
-                        previousPosition = -1;
-                        return;
-                    } else {
-                        stopVoiceItemAnim(previouceMessageType);
-                        animView = null;
-                        MediaManager.stopSound();
-                    }
+    public void onVoiceLongClick(final int position) {
+        showMenuDialog(R.array.menu_voice, new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                    int position, long arg3) {
+                switch (position) {
+                case 0:// Using the handset mode
+                    topbar.setTopbarModeResource(R.drawable.ic_chat_mode_headset);
+                    AppContext.isSpeakerOn = false;
+                    break;
+                case 1:// Using speak mode
+                    topbar.setTopbarModeResource(0);
+                    AppContext.isSpeakerOn = true;
+                    break;
+                case 2:// Delete
+                    ChatMessage message = mDatas.get(position);
+                    // delete voice file
+                    String filePath = message.getRecorder().getFilePath();
+                    Log.d("mikes", "filePath=" + filePath);
+                    File file = new File(filePath);
+                    file.delete();
+                    // delete database
+                    message.delete();
+                    // delete ListAdapter data
+                    mDatas.remove(position);
+                    mChatAdapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
                 }
+                mMenuDialog.dismiss();
             }
-            previousPosition = position;
-            previouceMessageType = messageType;
-            if (messageType == MessageType.FROM) {
-                animView = view
-                        .findViewById(R.id.id_chat_item_from_content_voice_anim);
-                animView.setBackgroundResource(R.drawable.recoder_from_play);
-            } else if (messageType == MessageType.TO) {
-                animView = view
-                        .findViewById(R.id.id_chat_item_to_content_voice_anim);
-                animView.setBackgroundResource(R.drawable.recoder_to_play);
-            }
-            drawable = (AnimationDrawable) animView.getBackground();
-            drawable.start();
+        });
+    }
 
-            try {
-                MediaManager.playSound(filePath, new OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer arg0) {
-                        stopVoiceItemAnim(messageType);
-                    }
-                });
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, getString(R.string.str_audio_notfound),
-                        Toast.LENGTH_SHORT).show();
-                // when occurs exception, audio player stop automatically.
-                stopVoiceItemAnim(messageType);
+    @Override
+    public void onImageClick(int position) {
+        Intent imageGallery = new Intent(this, ImageGalleryActivity.class);
+        startActivity(imageGallery);
+    }
+
+    @Override
+    public void onImageLongClick(final int position) {
+        showMenuDialog(R.array.menu_img, new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                    int position, long arg3) {
+                switch (position) {
+                case 0:// Delete
+                       // delete database
+                    ChatMessage message = mDatas.get(position);
+                    message.delete();
+                    // delete ListAdapter data
+                    mDatas.remove(position);
+                    mChatAdapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
+                }
+                mMenuDialog.dismiss();
             }
-        } else if (contentType == MessageContentType.IMG) {
-            Intent imageGallery = new Intent(this,ImageGalleryActivity.class);
-            startActivity(imageGallery);
-        }
+        });
+    }
+
+    @Override
+    public void onTxtLongClick(final int position) {
+        showMenuDialog(R.array.menu_txt, new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                    int position, long arg3) {
+                switch (position) {
+                case 0:// Copy
+                    setClipboard(mDatas.get(position).getContentText());
+                    break;
+                case 1:// Delete
+                       // delete database
+                    ChatMessage message = mDatas.get(position);
+                    message.delete();
+                    // delete ListAdapter data
+                    mDatas.remove(position);
+                    mChatAdapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
+                }
+                mMenuDialog.dismiss();
+            }
+        });
     }
 
     private void setClipboard(String text) {
@@ -634,98 +669,6 @@ public class LiaoChatActivity extends Activity implements
             Toast.makeText(this, getString(R.string.str_copy_already),
                     Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-            int position, long arg3) {
-        final int messgaePosition = position;
-        int messageContentType = mDatas.get(messgaePosition).getContentType();
-        switch (messageContentType) {
-        case MessageContentType.TXT:
-            showMenuDialog(R.array.menu_txt, new OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1,
-                        int position, long arg3) {
-                    switch (position) {
-                    case 0:// Copy
-                        setClipboard(mDatas.get(messgaePosition)
-                                .getContentText());
-                        break;
-                    case 1:// Delete
-                           // delete database
-                        ChatMessage message = mDatas.get(messgaePosition);
-                        message.delete();
-                        // delete ListAdapter data
-                        mDatas.remove(messgaePosition);
-                        mChatAdapter.notifyDataSetChanged();
-                        break;
-                    default:
-                        break;
-                    }
-                    mMenuDialog.dismiss();
-                }
-            });
-            break;
-        case MessageContentType.IMG:
-            showMenuDialog(R.array.menu_img, new OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1,
-                        int position, long arg3) {
-                    switch (position) {
-                    case 0:// Delete
-                        // delete database
-                        ChatMessage message = mDatas.get(messgaePosition);
-                        message.delete();
-                        // delete ListAdapter data
-                        mDatas.remove(messgaePosition);
-                        mChatAdapter.notifyDataSetChanged();
-                        break;
-                    default:
-                        break;
-                    }
-                    mMenuDialog.dismiss();
-                }
-            });
-            break;
-        case MessageContentType.VOICE:
-            showMenuDialog(R.array.menu_voice, new OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1,
-                        int position, long arg3) {
-                    switch (position) {
-                    case 0:// Using the handset mode
-                        topbar.setTopbarModeResource(R.drawable.ic_chat_mode_headset);
-                        AppContext.isSpeakerOn = false;
-                        break;
-                    case 1://Using speak mode
-                        topbar.setTopbarModeResource(0);
-                        AppContext.isSpeakerOn = true;
-                        break;
-                    case 2:// Delete
-                        ChatMessage message = mDatas.get(messgaePosition);
-                        // delete voice file
-                        String filePath = message.getRecorder().getFilePath();
-                        Log.d("mikes", "filePath=" + filePath);
-                        File file = new File(filePath);
-                        file.delete();
-                        // delete database
-                        message.delete();
-                        // delete ListAdapter data
-                        mDatas.remove(messgaePosition);
-                        mChatAdapter.notifyDataSetChanged();
-                        break;
-                    default:
-                        break;
-                    }
-                    mMenuDialog.dismiss();
-                }
-            });
-            break;
-        default:
-            break;
-        }
-        return true;
     }
 
     private void showMenuDialog(int resId, OnItemClickListener listener) {

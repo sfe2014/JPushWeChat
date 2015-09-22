@@ -4,6 +4,7 @@
     <string name="activity_imge_fullscreen">Image FullScreen</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
+    <string name="btn_send">Send</string>
     <string name="modify_icon_dialog_title">Choose Photos</string>
 
     <string-array name="modify_icon_dialog_choices">

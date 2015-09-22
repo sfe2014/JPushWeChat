@@ -121,10 +121,10 @@ public class CameraUtils {
     }
 
     /**
-     * 这个是找不到相关的图片浏览器,或者相册
+     * 没有相关的图片浏览器,或者相册
      */
     private static boolean openPhotosFinally() {
-        Toast.makeText(mContext, "您的系统没有文件浏览器或则相册支持,请安装！", Toast.LENGTH_LONG)
+        Toast.makeText(mContext, "您的系统没有文件浏览器或相册支持,请安装！", Toast.LENGTH_LONG)
                 .show();
         return false;
     }

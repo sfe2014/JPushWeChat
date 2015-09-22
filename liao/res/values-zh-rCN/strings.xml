@@ -4,6 +4,7 @@
     <string name="activity_imge_fullscreen">全屏显示图片</string>
     <string name="btn_cancel">取消</string>
     <string name="btn_ok">确定</string>
+    <string name="btn_send">发送</string>
     <string name="modify_icon_dialog_title">选择照片</string>
 
     <string-array name="modify_icon_dialog_choices">

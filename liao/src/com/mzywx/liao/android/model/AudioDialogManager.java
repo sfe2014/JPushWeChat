@@ -35,7 +35,7 @@ public class AudioDialogManager {
         	dialog.setVoiceVisibility(View.VISIBLE);
         	dialog.setLabelVisibility(View.VISIBLE);
 
-        	dialog.setIconImageResource(R.drawable.ic_chat_recoder);
+        	dialog.setIconImageResource(R.drawable.ic_chat_recoder_recording);
         	dialog.setLabelText(R.string.voice_recording);
         	dialog.setLabelTextBackground(R.drawable.back_record_label_normal_shape);
         }
@@ -48,7 +48,7 @@ public class AudioDialogManager {
         	dialog.setVoiceVisibility(View.GONE);
         	dialog.setLabelVisibility(View.VISIBLE);
 
-        	dialog.setIconImageResource(R.drawable.ic_chat_cancel);
+        	dialog.setIconImageResource(R.drawable.ic_chat_recorder_cancel);
         	dialog.setLabelText(R.string.voice_record_cancel);
         	dialog.setLabelTextBackground(R.drawable.back_record_label_cancel_shape);
         }
@@ -61,7 +61,7 @@ public class AudioDialogManager {
         	dialog.setVoiceVisibility(View.GONE);
         	dialog.setLabelVisibility(View.VISIBLE);
 
-        	dialog.setIconImageResource(R.drawable.ic_chat_warning);
+        	dialog.setIconImageResource(R.drawable.ic_chat_recorder_warning);
         	dialog.setLabelText(R.string.voice_record_too_short);
         }
     }
