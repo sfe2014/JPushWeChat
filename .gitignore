@@ -1,4 +1,4 @@
 .project
-/bin
-/gen
+bin/
+gen/
 .classpath
