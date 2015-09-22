@@ -3,9 +3,9 @@ package com.mzywx.liao.android.ui;
 import java.io.File;
 
 import com.mzywx.liao.android.R;
-import com.mzywx.liao.android.utils.CustomTopBarNew;
-import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
-import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewRightButtonListener;
+import com.mzywx.liao.android.utils.views.CustomTopBarNew;
+import com.mzywx.liao.android.utils.views.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
+import com.mzywx.liao.android.utils.views.CustomTopBarNew.OnTopbarNewRightButtonListener;
 import com.squareup.picasso.Picasso;
 
 import android.app.Activity;

@@ -23,12 +23,14 @@ import com.mzywx.liao.android.bean.ChatMessage.MessageType;
 import com.mzywx.liao.android.db.DbQueryHelper;
 import com.mzywx.liao.android.model.MediaManager;
 import com.mzywx.liao.android.model.MediaManager.GetDurationCallBack;
-import com.mzywx.liao.android.utils.AudioRecorderButton;
-import com.mzywx.liao.android.utils.AudioRecorderButton.AudioFinishRecorderListener;
 import com.mzywx.liao.android.utils.CameraUtils;
-import com.mzywx.liao.android.utils.CustomTopBarNew;
-import com.mzywx.liao.android.utils.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
-import com.mzywx.liao.android.utils.MenuDialog;
+import com.mzywx.liao.android.utils.views.AudioRecorderButton;
+import com.mzywx.liao.android.utils.views.CustomTopBarNew;
+import com.mzywx.liao.android.utils.views.ExpressionDialog;
+import com.mzywx.liao.android.utils.views.MenuDialog;
+import com.mzywx.liao.android.utils.views.AudioRecorderButton.AudioFinishRecorderListener;
+import com.mzywx.liao.android.utils.views.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
+import com.mzywx.liao.android.utils.views.ExpressionDialog.ChooseExpressionClickListener;
 import com.mzywx.liao.android.utils.NetworkHelper;
 
 import android.app.Activity;
@@ -43,6 +45,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -100,6 +103,7 @@ public class LiaoChatActivity extends Activity implements
     private ImageView mAddPictureButton;
     private ImageView mVoiceToggleButton;
     private AudioRecorderButton mVoiceButton;
+    private ImageView mExpressionButton;
 
     private String mContentString;
 
@@ -223,6 +227,8 @@ public class LiaoChatActivity extends Activity implements
                                         + recordMessage.getRecorder().getId());
                     }
                 });
+        mExpressionButton = (ImageView) findViewById(R.id.id_chat_main_expression);
+        mExpressionButton.setOnClickListener(mOnClickListener);
 
         mMenuDialog = new MenuDialog(this);
     }
@@ -418,12 +424,28 @@ public class LiaoChatActivity extends Activity implements
                     showImm();
                 }
                 break;
+            case R.id.id_chat_main_expression:
+                createExpressionDialog();
+                break;
             default:
                 break;
             }
         }
     };
-    
+
+    /**
+     * 创建一个表情选择对话框
+     */
+    private void createExpressionDialog() {
+        ExpressionDialog dialog = new ExpressionDialog(this);
+        dialog.showExpressionDialog(new ChooseExpressionClickListener() {
+            @Override
+            public void expressionClick(SpannableString spannableString) {
+                mContentEdit.append(spannableString);
+            }
+        });
+    }
+
     /**
      * 滚动ListView到指定位置
      * 
@@ -438,6 +460,7 @@ public class LiaoChatActivity extends Activity implements
     }
 
     private void hideImm() {
+        mContentEdit.clearFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         boolean isShown = imm.isActive();
         if (isShown) {
@@ -736,5 +759,4 @@ public class LiaoChatActivity extends Activity implements
     public void onTopbarLeftLayoutSelected() {
         this.finish();
     }
-
 }

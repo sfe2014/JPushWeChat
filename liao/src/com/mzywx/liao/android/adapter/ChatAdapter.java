@@ -9,10 +9,12 @@ import com.mzywx.liao.android.bean.ChatMessage.MessageContentType;
 import com.mzywx.liao.android.bean.ChatMessage.MessageState;
 import com.mzywx.liao.android.bean.ChatMessage.MessageType;
 import com.mzywx.liao.android.utils.CircleAnimation;
+import com.mzywx.liao.android.utils.ExpressionUtil;
 import com.mzywx.liao.android.utils.TimeUtil;
 import com.squareup.picasso.Picasso;
 
 import android.content.Context;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -189,8 +191,20 @@ public class ChatAdapter extends BaseAdapter {
             holder.itemContentTxt.setVisibility(View.VISIBLE);
             holder.itemContentImg.setVisibility(View.GONE);
 
-            holder.itemContentTxt
-                    .setText(mDatas.get(position).getContentText());
+            String txt = mDatas.get(position).getContentText();
+            String pattern = "f0[0-9]{2}|f10[0-7]";
+            try {
+                SpannableString spannableString = ExpressionUtil
+                        .getExpressionString(mContext, txt, pattern);
+                holder.itemContentTxt.setText(spannableString);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+
             holder.itemContentTxt
                     .setOnLongClickListener(new OnLongClickListener() {
                         @Override

@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".PickImageActivity" >
 
-    <com.mzywx.liao.android.utils.CustomTopBarNew
+    <com.mzywx.liao.android.utils.views.CustomTopBarNew
         android:id="@+id/id_chat_fullscreen_topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

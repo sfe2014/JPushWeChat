@@ -42,7 +42,7 @@
                 android:id="@+id/id_chat_item_to_content_voice_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_chat_to_background"
+                android:background="@drawable/back_chat_to_selector"
                 android:gravity="center_vertical"
                 android:padding="5dp"
                 android:visibility="gone" >
@@ -71,7 +71,7 @@
                 android:id="@+id/id_chat_item_to_content_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_chat_to_background"
+                android:background="@drawable/back_chat_to_selector"
                 android:padding="8dp"
                 android:scaleType="centerInside"
                 android:visibility="gone"
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/id_chat_item_to_content_img"
-                android:background="@drawable/ic_chat_to_background"
+                android:background="@drawable/back_chat_to_selector"
                 android:gravity="center"
                 android:padding="5dp" >
             </TextView>

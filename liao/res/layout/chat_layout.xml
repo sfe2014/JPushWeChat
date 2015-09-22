@@ -7,7 +7,7 @@
     android:background="@color/color_list_bac"
     tools:context=".LiaoChatActivity" >
 
-    <com.mzywx.liao.android.utils.CustomTopBarNew
+    <com.mzywx.liao.android.utils.views.CustomTopBarNew
         android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -16,8 +16,8 @@
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color_bottom"
         android:layout_alignParentBottom="true"
+        android:background="@color/color_bottom"
         android:orientation="vertical" >
 
         <RelativeLayout
@@ -54,7 +54,7 @@
 
                     <Button
                         android:id="@+id/id_chat_main_send"
-                        android:layout_width="56dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@drawable/back_send_selector"
@@ -67,25 +67,35 @@
                         android:id="@+id/id_chat_main_add"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
                         android:scaleType="centerInside"
-                        android:src="@drawable/ic_chat_add"
+                        android:src="@drawable/chat_add_selector"
                         tools:ignore="ContentDescription" />
                 </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/id_chat_main_expression"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerInside"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/id_chat_main_send_layout"
+                    android:layout_marginRight="3dp"
+                    android:src="@drawable/chat_expression_selector"
+                    tools:ignore="ContentDescription" />
 
                 <EditText
                     android:id="@+id/id_chat_main_edit"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@id/id_chat_main_send_layout"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_toLeftOf="@id/id_chat_main_expression"
                     android:inputType="text" >
                 </EditText>
             </RelativeLayout>
 
-            <com.mzywx.liao.android.utils.AudioRecorderButton
+            <com.mzywx.liao.android.utils.views.AudioRecorderButton
                 android:id="@+id/id_chat_main_record"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -106,8 +116,8 @@
             android:layout_height="wrap_content"
             android:padding="24dp"
             android:stretchColumns="0,1"
-            tools:ignore="UselessParent"
-            android:visibility="gone" >
+            android:visibility="gone"
+            tools:ignore="UselessParent" >
 
             <TableRow>
 
@@ -116,16 +126,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="centerInside"
-                    tools:ignore="contentDescription"
-                    android:src="@drawable/ic_chat_addpicture" />
+                    android:src="@drawable/ic_chat_addpicture"
+                    tools:ignore="contentDescription" />
 
                 <ImageView
                     android:id="@+id/id_chat_addcamera"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="centerInside"
-                    tools:ignore="contentDescription"
-                    android:src="@drawable/ic_chat_addcamera" />
+                    android:src="@drawable/ic_chat_addcamera"
+                    tools:ignore="contentDescription" />
             </TableRow>
         </TableLayout>
     </LinearLayout>

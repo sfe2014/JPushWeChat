@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/expression_dialog_rootView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#00000000"
+    android:padding="32dp"
+    android:scrollbars="none" >
+
+    <RelativeLayout
+        android:id="@+id/expression_dialog_contentview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_background" >
+
+        <GridView
+            android:id="@+id/id_dialog_expression_gv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:horizontalSpacing="8dp"
+            android:numColumns="7"
+            android:listSelector="#00ffffff"
+            android:scrollbars="none"
+            android:verticalSpacing="3dp" >
+        </GridView>
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,7 +1,7 @@
 package com.mzywx.liao.android.model;
 
 import com.mzywx.liao.android.R;
-import com.mzywx.liao.android.utils.RecoderDialog;
+import com.mzywx.liao.android.utils.views.RecoderDialog;
 
 import android.content.Context;
 import android.os.Vibrator;
