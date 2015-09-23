@@ -12,6 +12,8 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 
 public class ExpressionUtil {
+    public static final String EXPRESSION_PATTERN = "f0[0-9]{2}|f10[0-7]";
+    
     /**
      * 对spanableString进行正则判断，如果符合要求，则以表情图片代替
      * 

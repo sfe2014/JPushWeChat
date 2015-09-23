@@ -192,10 +192,10 @@ public class ChatAdapter extends BaseAdapter {
             holder.itemContentImg.setVisibility(View.GONE);
 
             String txt = mDatas.get(position).getContentText();
-            String pattern = "f0[0-9]{2}|f10[0-7]";
             try {
                 SpannableString spannableString = ExpressionUtil
-                        .getExpressionString(mContext, txt, pattern);
+                        .getExpressionString(mContext, txt, ExpressionUtil.EXPRESSION_PATTERN);
+                Log.d("mikes", "spannableString:"+spannableString);
                 holder.itemContentTxt.setText(spannableString);
             } catch (NumberFormatException e) {
                 e.printStackTrace();

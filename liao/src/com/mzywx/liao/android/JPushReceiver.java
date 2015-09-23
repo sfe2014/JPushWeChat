@@ -5,7 +5,10 @@ import org.json.JSONObject;
 
 import com.mzywx.liao.android.ui.LiaoChatActivity;
 import com.mzywx.liao.android.utils.JPushUtil;
+import com.mzywx.liao.android.utils.NotificationHelper;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -116,6 +119,44 @@ public class JPushReceiver extends BroadcastReceiver {
                 }
             }
             context.sendBroadcast(msgIntent);
+        } else {
+            String message = bundle.getString(JPushInterface.EXTRA_MESSAGE);
+            String extras = bundle.getString(JPushInterface.EXTRA_EXTRA);
+            boolean hasImage, hasVoice;
+            hasImage = hasVoice = false;
+
+            Intent intent = new Intent("com.mzywx.android.MESSAGE_RECEIVED_ACTION");
+            if (!JPushUtil.isEmpty(extras)) {
+                try {
+                    JSONObject extraJson = new JSONObject(extras);
+                    if (null != extraJson && extraJson.length() > 0) {
+                        if (!extraJson.isNull(LiaoChatActivity.KEY_IMG)) {
+                            hasImage = true;
+                            intent.putExtra(
+                                    LiaoChatActivity.KEY_IMG,
+                                    extraJson
+                                            .getString(LiaoChatActivity.KEY_IMG));
+                        }
+                        if (!extraJson.isNull(LiaoChatActivity.KEY_VOICE)) {
+                            hasVoice = true;
+                            intent.putExtra(
+                                    LiaoChatActivity.KEY_VOICE,
+                                    extraJson
+                                            .getString(LiaoChatActivity.KEY_VOICE));
+                        }
+                    }
+                } catch (JSONException e) {
+
+                }
+            }
+            
+            intent.putExtra(LiaoChatActivity.KEY_MESSAGE, message);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 1,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT);
+            
+            NotificationHelper.postNotification(context, pendingIntent, message,
+                    hasImage, hasVoice);
         }
     }
 }

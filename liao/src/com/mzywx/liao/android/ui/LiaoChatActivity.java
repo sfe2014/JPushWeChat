@@ -26,13 +26,12 @@ import com.mzywx.liao.android.db.DbQueryHelper;
 import com.mzywx.liao.android.model.MediaManager;
 import com.mzywx.liao.android.model.MediaManager.GetDurationCallBack;
 import com.mzywx.liao.android.utils.CameraUtils;
+import com.mzywx.liao.android.utils.ExpressionUtil;
 import com.mzywx.liao.android.utils.views.AudioRecorderButton;
 import com.mzywx.liao.android.utils.views.CustomTopBarNew;
-import com.mzywx.liao.android.utils.views.ExpressionDialog;
 import com.mzywx.liao.android.utils.views.MenuDialog;
 import com.mzywx.liao.android.utils.views.AudioRecorderButton.AudioFinishRecorderListener;
 import com.mzywx.liao.android.utils.views.CustomTopBarNew.OnTopbarNewLeftLayoutListener;
-import com.mzywx.liao.android.utils.views.ExpressionDialog.ChooseExpressionClickListener;
 import com.mzywx.liao.android.utils.NetworkHelper;
 
 import android.app.Activity;
@@ -48,6 +47,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -58,6 +58,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View.OnClickListener;
 import android.view.View.OnLayoutChangeListener;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -67,7 +68,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -75,36 +75,33 @@ import android.widget.Toast;
 
 /**
  * 聊天界面
- * 
+ * 项目编码UTF-8 
  */
 public class LiaoChatActivity extends Activity implements
         OnLayoutChangeListener, VoiceClickListener,
         OnTopbarNewLeftLayoutListener {
+    
+    private static final String TAG = "liao";
 
     private static final int PICK_CAMERA = 0x11;
     private static final int PICK_PICTURE = 0x12;
     private static final int OPEN_FULLSCREEN = 0x13;
+    
+    private static final int LIST_LOADING_DELAYED = 3000;
 
     private static final int LIMIT = 10;
-    private int offset = 0;
     private static final int OFFSET_STEP = 10;
-
-    private String mCameraPhotoPath = "";// 当前图片路径
+    private int offset = 0;
+    
+    private Context mContext;
 
     private View mRootView;
     private View mBottomView;
-
+    private View mListHeaderView;
     private View mMoreView;
+    
     private ImageView mAddPicture;
     private ImageView mAddCamera;
-
-    // 软件盘弹起后所占高度阀值
-    private int keyHeight = 0;
-
-    private ListView mChatListView;
-    private ChatAdapter mChatAdapter;
-    private List<ChatMessage> mDatas = new ArrayList<ChatMessage>();
-
     private EditText mContentEdit;
     private Button mSendButton;
     private ImageView mAddPictureButton;
@@ -113,16 +110,25 @@ public class LiaoChatActivity extends Activity implements
     private ImageView mExpressionButton;
     private TwoWayGridView mExpressionGridView;
 
-    private String mContentString;
+    private int[] imageIds = new int[107];// 表情数目
+    private int keyHeight = 0;// 软件盘弹起后所占高度阀值
 
-    private int mContentType = MessageContentType.DEFAULT;
-    // listview
+    private ListView mChatListView;
+    private ChatAdapter mChatAdapter;
+    private List<ChatMessage> mDatas = new ArrayList<ChatMessage>();
+    
     private boolean scrollFlag = false;// 标记是否滑动
     public static boolean isForeground = false;
+
+    private String mCameraPhotoPath = "";// 当前图片路径
+    private String mContentString;//输入的文本内容
+
+    private int mContentType = MessageContentType.DEFAULT;
 
     // for receive customer msg from jpush server
     private MessageReceiver mMessageReceiver;
     public static final String MESSAGE_RECEIVED_ACTION = "com.example.jpushdemo.MESSAGE_RECEIVED_ACTION";
+    public static final String NOTIFICATION_RECEIVED_ACTION = "com.mzywx.android.MESSAGE_RECEIVED_ACTION";
     public static final String KEY_TITLE = "title";
     public static final String KEY_MESSAGE = "message";// 自定义消息中的文本
     public static final String KEY_EXTRAS = "extras";
@@ -133,13 +139,12 @@ public class LiaoChatActivity extends Activity implements
 
     CustomTopBarNew topbar;
 
+    //语音播放动画
     View animView;
     AnimationDrawable drawable;
     private int previouceMessageType = -1;
     private int previousPosition = -1;
-
     MenuDialog mMenuDialog;
-    private int[] imageIds = new int[107];//表情数目
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +152,7 @@ public class LiaoChatActivity extends Activity implements
         setContentView(R.layout.chat_layout);
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        registerMessageReceiver(); // used for receive msg
+        registerMessageReceiver();
 
         init();
         initDatas();
@@ -156,17 +161,30 @@ public class LiaoChatActivity extends Activity implements
     @Override
     protected void onResume() {
         super.onResume();
+        isForeground = true;
         MediaManager.resume();
         JPushInterface.onResume(this);
-        isForeground = true;
         mRootView.addOnLayoutChangeListener(this);
+        
+        if (NOTIFICATION_RECEIVED_ACTION.equals(getIntent().getAction())) {
+            String messge = getIntent().getStringExtra(KEY_MESSAGE);
+            String img = getIntent().getStringExtra(KEY_IMG);
+            String voice = getIntent().getStringExtra(KEY_VOICE);
+            if (!TextUtils.isEmpty(img)) {
+                addImg(MessageType.FROM, img);
+            } else if (!TextUtils.isEmpty(voice)) {
+                addVoice(voice);
+            } else {
+                addTxt(MessageType.FROM, messge);
+            }
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        MediaManager.pause();
         isForeground = false;
+        MediaManager.pause();
         JPushInterface.onPause(this);
     }
 
@@ -186,6 +204,7 @@ public class LiaoChatActivity extends Activity implements
     }
 
     private void init() {
+        mContext = getApplicationContext();
         initTopBar();
 
         mRootView = findViewById(R.id.id_chat_main_rootview);
@@ -202,6 +221,8 @@ public class LiaoChatActivity extends Activity implements
 
         mBottomView = findViewById(R.id.id_chat_main_btn_bottom);
         mChatListView = (ListView) findViewById(R.id.id_chat_main_list);
+        mListHeaderView = LayoutInflater.from(this).inflate(R.layout.chat_list_header_layout, null);
+        mChatListView.addHeaderView(mListHeaderView);//加载动画
 
         mContentEdit = (EditText) findViewById(R.id.id_chat_main_edit);
         mContentEdit.addTextChangedListener(new ContentWatcher());
@@ -399,14 +420,14 @@ public class LiaoChatActivity extends Activity implements
                 mContentEdit.setText("");
                 break;
             case R.id.id_chat_main_add:
-                if (mMoreView.getVisibility() == View.GONE) {
-                    mExpressionGridView.setVisibility(View.GONE);
-                    mMoreView.setVisibility(View.VISIBLE);
-                    hideImm();
-                } else {
+                if (mMoreView.isShown()) {
                     mExpressionGridView.setVisibility(View.GONE);
                     mMoreView.setVisibility(View.GONE);
                     showImm();
+                } else {
+                    mExpressionGridView.setVisibility(View.GONE);
+                    mMoreView.setVisibility(View.VISIBLE);
+                    hideImm();
                 }
                 break;
             case R.id.id_chat_addcamera:
@@ -422,12 +443,14 @@ public class LiaoChatActivity extends Activity implements
                 break;
             case R.id.id_chat_main_voice:
                 mContentType = MessageContentType.VOICE;
-                if (mBottomView.getVisibility() == View.VISIBLE) {
+                if (mBottomView.isShown()) {
                     mVoiceToggleButton
                             .setImageResource(R.drawable.ic_chat_keyboard);
                     hideImm();
                     mVoiceButton.setVisibility(View.VISIBLE);
                     mBottomView.setVisibility(View.GONE);
+                    mMoreView.setVisibility(View.GONE);
+                    mExpressionGridView.setVisibility(View.GONE);
                 } else {
                     mVoiceToggleButton
                             .setImageResource(R.drawable.ic_chat_voice_button);
@@ -437,7 +460,7 @@ public class LiaoChatActivity extends Activity implements
                 }
                 break;
             case R.id.id_chat_main_expression:
-                createExpressionDialog();
+                createExpressionWindow();
                 break;
             default:
                 break;
@@ -448,7 +471,7 @@ public class LiaoChatActivity extends Activity implements
     /**
      * 显示表情选择框
      */
-    private void createExpressionDialog() {
+    private void createExpressionWindow() {
         if (mExpressionGridView.isShown()) {
             mExpressionGridView.setVisibility(View.GONE);
             showImm();
@@ -458,35 +481,38 @@ public class LiaoChatActivity extends Activity implements
             hideImm();
 
             mExpressionGridView.setAdapter(createSimpleAdapter());
-            mExpressionGridView.setOnItemClickListener(new com.mzywx.android.ui.TwoWayAdapterView.OnItemClickListener() {
+            mExpressionGridView
+                    .setOnItemClickListener(new com.mzywx.android.ui.TwoWayAdapterView.OnItemClickListener() {
 
-                @Override
-                public void onItemClick(TwoWayAdapterView<?> parent, View view,
-                        int position, long id) {
-                    Log.d("mikes", "gridview item click position="+position
-                            +", id="+id);
-                    Bitmap bitmap = BitmapFactory.decodeResource(
-                            LiaoChatActivity.this.getResources(),
-                            imageIds[position % imageIds.length]);
-                    ImageSpan imageSpan = new ImageSpan(LiaoChatActivity.this, bitmap);
-                    String str = null;
-                    if (position < 10) {
-                        str = "f00" + position;
-                    } else if (position < 100) {
-                        str = "f0" + position;
-                    } else {
-                        str = "f" + position;
-                    }
-                    SpannableString spannableString = new SpannableString(str);
-                    spannableString.setSpan(imageSpan, 0, 4,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    mContentEdit.append(spannableString);
-                }
-            });
+                        @Override
+                        public void onItemClick(TwoWayAdapterView<?> parent,
+                                View view, int position, long id) {
+                            Log.d("mikes", "gridview item click position="
+                                    + position + ", id=" + id);
+                            Bitmap bitmap = BitmapFactory.decodeResource(
+                                    LiaoChatActivity.this.getResources(),
+                                    imageIds[position % imageIds.length]);
+                            ImageSpan imageSpan = new ImageSpan(
+                                    LiaoChatActivity.this, bitmap);
+                            String str = null;
+                            if (position < 10) {
+                                str = "f00" + position;
+                            } else if (position < 100) {
+                                str = "f0" + position;
+                            } else {
+                                str = "f" + position;
+                            }
+                            SpannableString spannableString = new SpannableString(
+                                    str);
+                            spannableString.setSpan(imageSpan, 0, 4,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            mContentEdit.append(spannableString);
+                        }
+                    });
         }
     }
-    
-    private SimpleAdapter createSimpleAdapter(){
+
+    private SimpleAdapter createSimpleAdapter() {
         List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
         for (int i = 0; i < imageIds.length; i++) {
             try {
@@ -517,7 +543,8 @@ public class LiaoChatActivity extends Activity implements
 
         SimpleAdapter simpleAdapter = new SimpleAdapter(this, listItems,
                 R.layout.layout_single_expression_cell,
-                new String[] { "image" }, new int[] { R.id.id_expression_cell_image });
+                new String[] { "image" },
+                new int[] { R.id.id_expression_cell_image });
         return simpleAdapter;
     }
 
@@ -558,7 +585,13 @@ public class LiaoChatActivity extends Activity implements
                 scrollFlag = false;
                 // 滚动到顶部
                 if (mChatListView.getFirstVisiblePosition() == 0) {
-                    loadMoreDatas();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListHeaderView.setVisibility(View.GONE);
+                            loadMoreDatas();
+                        }
+                    }, LIST_LOADING_DELAYED);
                 }
                 break;
             case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:// 滚动时
@@ -577,24 +610,29 @@ public class LiaoChatActivity extends Activity implements
                 if (mMoreView.isShown()) {
                     mMoreView.setVisibility(View.GONE);
                 }
+                if (mExpressionGridView.isShown()) {
+                    mExpressionGridView.setVisibility(View.GONE);
+                }
                 hideImm();
             }
         }
     };
 
+    //监听窗口软键盘变化
     @Override
     public void onLayoutChange(View v, int left, int top, int right,
             int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
         if (oldBottom != 0 && bottom != 0 && (oldBottom - bottom > keyHeight)) {
-            Log.d("mikes", "keyboard open");
             // soft keyboard opened
-            if (mMoreView.getVisibility() == View.VISIBLE) {
+            if (mMoreView.isShown()) {
                 mMoreView.setVisibility(View.GONE);
+            }
+            if (mExpressionGridView.isShown()) {
+                mExpressionGridView.setVisibility(View.GONE);
             }
             setListViewPos(mChatAdapter.getCount());
         } else if (oldBottom != 0 && bottom != 0
                 && (bottom - oldBottom > keyHeight)) {// soft keyboard closed
-            Log.d("mikes", "keyboard close");
         }
     }
 
@@ -735,14 +773,16 @@ public class LiaoChatActivity extends Activity implements
     }
 
     @Override
-    public void onTxtLongClick(final int position) {
+    public void onTxtLongClick(final int messagePosition) {
         showMenuDialog(R.array.menu_txt, new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                     int position, long arg3) {
                 switch (position) {
                 case 0:// Copy
-                    setClipboard(mDatas.get(position).getContentText());
+                    Log.d("mikes", "txt:"
+                            + mDatas.get(messagePosition).getContentText());
+                    setClipboard(mDatas.get(messagePosition).getContentText());
                     break;
                 case 1:// Delete
                        // delete database
@@ -784,6 +824,7 @@ public class LiaoChatActivity extends Activity implements
         mMenuDialog.setSimpleAdapter(adapter, listener);
     }
 
+    //接受极光推送信息
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -806,18 +847,19 @@ public class LiaoChatActivity extends Activity implements
 
         @Override
         public void afterTextChanged(Editable arg0) {
-
         }
 
         @Override
         public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
                 int arg3) {
-
         }
 
         @Override
         public void onTextChanged(CharSequence s, int arg1, int arg2, int arg3) {
+            Log.d("lyl", "onTextChanged:s="+s);
             if (s.length() > 0) {
+                SpannableString spannableString = ExpressionUtil
+                        .getExpressionString(mContext, s.toString(), ExpressionUtil.EXPRESSION_PATTERN);
                 mContentType = MessageContentType.TXT;
                 mSendButton.setVisibility(View.VISIBLE);
                 mAddPictureButton.setVisibility(View.GONE);
