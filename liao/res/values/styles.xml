@@ -36,7 +36,7 @@
         <item name="android:scrollingCache">false</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:cacheColorHint">#0000</item>
-        <item name="android:stackFromBottom">true</item>
+        <item name="android:stackFromBottom">false</item>
         <!-- <item name="android:transcriptMode">alwaysScroll</item> --><!-- 自动滚动到最新数据处 -->
     </style>
 

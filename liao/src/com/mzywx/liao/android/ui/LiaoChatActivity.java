@@ -11,6 +11,8 @@ import java.util.Map;
 
 import cn.jpush.android.api.JPushInterface;
 
+import com.mzywx.android.ui.TwoWayAdapterView;
+import com.mzywx.android.ui.TwoWayGridView;
 import com.mzywx.liao.android.AppContext;
 import com.mzywx.liao.android.R;
 import com.mzywx.liao.android.adapter.ChatAdapter;
@@ -39,15 +41,19 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View.OnClickListener;
@@ -61,6 +67,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -104,6 +111,7 @@ public class LiaoChatActivity extends Activity implements
     private ImageView mVoiceToggleButton;
     private AudioRecorderButton mVoiceButton;
     private ImageView mExpressionButton;
+    private TwoWayGridView mExpressionGridView;
 
     private String mContentString;
 
@@ -131,6 +139,7 @@ public class LiaoChatActivity extends Activity implements
     private int previousPosition = -1;
 
     MenuDialog mMenuDialog;
+    private int[] imageIds = new int[107];//表情数目
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,6 +238,7 @@ public class LiaoChatActivity extends Activity implements
                 });
         mExpressionButton = (ImageView) findViewById(R.id.id_chat_main_expression);
         mExpressionButton.setOnClickListener(mOnClickListener);
+        mExpressionGridView = (TwoWayGridView) findViewById(R.id.id_chat_expression_gridview);
 
         mMenuDialog = new MenuDialog(this);
     }
@@ -390,11 +400,13 @@ public class LiaoChatActivity extends Activity implements
                 break;
             case R.id.id_chat_main_add:
                 if (mMoreView.getVisibility() == View.GONE) {
+                    mExpressionGridView.setVisibility(View.GONE);
                     mMoreView.setVisibility(View.VISIBLE);
                     hideImm();
                 } else {
-                    showImm();
+                    mExpressionGridView.setVisibility(View.GONE);
                     mMoreView.setVisibility(View.GONE);
+                    showImm();
                 }
                 break;
             case R.id.id_chat_addcamera:
@@ -434,16 +446,79 @@ public class LiaoChatActivity extends Activity implements
     };
 
     /**
-     * 创建一个表情选择对话框
+     * 显示表情选择框
      */
     private void createExpressionDialog() {
-        ExpressionDialog dialog = new ExpressionDialog(this);
-        dialog.showExpressionDialog(new ChooseExpressionClickListener() {
-            @Override
-            public void expressionClick(SpannableString spannableString) {
-                mContentEdit.append(spannableString);
+        if (mExpressionGridView.isShown()) {
+            mExpressionGridView.setVisibility(View.GONE);
+            showImm();
+        } else {
+            mMoreView.setVisibility(View.GONE);
+            mExpressionGridView.setVisibility(View.VISIBLE);
+            hideImm();
+
+            mExpressionGridView.setAdapter(createSimpleAdapter());
+            mExpressionGridView.setOnItemClickListener(new com.mzywx.android.ui.TwoWayAdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(TwoWayAdapterView<?> parent, View view,
+                        int position, long id) {
+                    Log.d("mikes", "gridview item click position="+position
+                            +", id="+id);
+                    Bitmap bitmap = BitmapFactory.decodeResource(
+                            LiaoChatActivity.this.getResources(),
+                            imageIds[position % imageIds.length]);
+                    ImageSpan imageSpan = new ImageSpan(LiaoChatActivity.this, bitmap);
+                    String str = null;
+                    if (position < 10) {
+                        str = "f00" + position;
+                    } else if (position < 100) {
+                        str = "f0" + position;
+                    } else {
+                        str = "f" + position;
+                    }
+                    SpannableString spannableString = new SpannableString(str);
+                    spannableString.setSpan(imageSpan, 0, 4,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    mContentEdit.append(spannableString);
+                }
+            });
+        }
+    }
+    
+    private SimpleAdapter createSimpleAdapter(){
+        List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
+        for (int i = 0; i < imageIds.length; i++) {
+            try {
+                if (i < 10) {
+                    int resId = this.getResources().getIdentifier("f00" + i,
+                            "drawable", this.getPackageName());
+                    imageIds[i] = resId;
+                } else if (i < 100) {
+                    int resId = this.getResources().getIdentifier("f0" + i,
+                            "drawable", this.getPackageName());
+                    imageIds[i] = resId;
+                } else {
+                    int resId = this.getResources().getIdentifier("f" + i,
+                            "drawable", this.getPackageName());
+                    imageIds[i] = resId;
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
             }
-        });
+            Map<String, Object> listItem = new HashMap<String, Object>();
+            listItem.put("image", imageIds[i]);
+            listItems.add(listItem);
+        }
+
+        SimpleAdapter simpleAdapter = new SimpleAdapter(this, listItems,
+                R.layout.layout_single_expression_cell,
+                new String[] { "image" }, new int[] { R.id.id_expression_cell_image });
+        return simpleAdapter;
     }
 
     /**
