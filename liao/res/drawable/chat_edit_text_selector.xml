@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_window_focused="false" android:state_enabled="true" android:drawable="@drawable/ic_chat_line_normal" />
-    <item android:state_window_focused="false" android:state_enabled="false" android:drawable="@drawable/ic_chat_line_normal" />
-    <item android:state_enabled="true" android:state_focused="true" android:drawable="@drawable/ic_chat_line_focused" />
-    <item android:state_enabled="true" android:drawable="@drawable/ic_chat_line_normal" />
-    <item android:state_focused="true" android:drawable="@drawable/ic_chat_line_focused" />
-    <item android:drawable="@drawable/ic_chat_line_normal" />
+    <item android:state_window_focused="false" android:state_enabled="true" android:drawable="@drawable/ic_textfield_default" />
+    <item android:state_window_focused="false" android:state_enabled="false" android:drawable="@drawable/ic_textfield_disabled" />
+    <item android:state_enabled="true" android:state_focused="true" android:drawable="@drawable/ic_textfield_selected" />
+    <item android:state_enabled="true" android:drawable="@drawable/ic_textfield_default" />
+    <item android:state_focused="true" android:drawable="@drawable/ic_textfield_selected" />
+    <item android:drawable="@drawable/ic_textfield_disabled" />
 </selector>

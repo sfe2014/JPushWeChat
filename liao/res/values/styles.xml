@@ -37,7 +37,8 @@
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:cacheColorHint">#0000</item>
         <item name="android:stackFromBottom">false</item>
-        <!-- <item name="android:transcriptMode">alwaysScroll</item> --><!-- 自动滚动到最新数据处 -->
+        <!-- <item name="android:transcriptMode">alwaysScroll</item> -->
+        <!-- 自动滚动到最新数据处 -->
     </style>
 
     <!-- 录音时对话框属性 -->
@@ -51,10 +52,14 @@
         <item name="android:windowBackground">@null</item>
     </style>
 
-    <style name="Theme_EditText" parent="@android:style/Widget.EditText">
+    <style name="Theme_EditText">
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:clickable">true</item>
         <item name="android:background">@drawable/chat_edit_text_selector</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
-    
+
     <style name="Theme_TimeText" parent="@android:style/Widget.TextView">
         <item name="android:background">@drawable/back_item_time_shape</item>
         <item name="android:gravity">center</item>
@@ -62,4 +67,5 @@
         <item name="android:textSize">@dimen/text_time</item>
         <item name="android:padding">5dp</item>
     </style>
+
 </resources>

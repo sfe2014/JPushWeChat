@@ -92,6 +92,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:layout_toLeftOf="@id/id_chat_main_expression"
+                    style="@style/Theme_EditText"
                     android:inputType="text" >
                 </EditText>
             </RelativeLayout>
